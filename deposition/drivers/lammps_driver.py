@@ -4,6 +4,7 @@ from pymatgen.io.lammps.data import LammpsData
 from schema import And, Optional, Or, Use
 
 from deposition import input_schema, io
+from deposition.enums import SettingsEnum
 from deposition.drivers.molecular_dynamics_driver import \
     MolecularDynamicsDriver
 from deposition.state import State
@@ -74,12 +75,12 @@ class LAMMPSDriver(MolecularDynamicsDriver):
 
         if iteration_stage == "relaxation":
             relaxation_num_steps = (
-                self.settings["relaxation_time_picoseconds"] * scaling
+                self.settings[SettingsEnum.RELAXATION_TIME.value] * scaling
             )
             template_values.update({"num_steps": int(relaxation_num_steps)})
         elif iteration_stage == "deposition":
             deposition_num_steps = (
-                self.settings["deposition_time_picoseconds"] * scaling
+                self.settings[SettingsEnum.DEPOSITION_TIME.value] * scaling
             )
             template_values.update({"num_steps": int(deposition_num_steps)})
 

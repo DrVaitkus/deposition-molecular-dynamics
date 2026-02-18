@@ -13,14 +13,14 @@ from deposition.enums import SettingsEnum, SimulationCellEnum
 class DepositionTypeEnum(Enum):
     """List of explicitly allowed deposition types along with conditionally required settings"""
 
-    monatomic = ["deposition_element"]
-    molecule = ["molecule_xyz_file"]
+    MONATOMIC = ["deposition_element"]
+    MOLECULE = ["molecule_xyz_file"]
 
 
 def allowed_deposition_types(deposition_type):
     """Checks that the given deposition type is in the list of allowed types."""
     try:
-        return DepositionTypeEnum[deposition_type].name
+        return DepositionTypeEnum[deposition_type.upper()].name
     except KeyError:
         raise SchemaError(
             f"deposition type must be one of: {[x.name for x in DepositionTypeEnum]}"

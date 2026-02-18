@@ -1,12 +1,12 @@
 # 1. Deposition settings (physics)
 deposition_element: O
 deposition_type: monatomic
-deposition_height_Angstroms: 10
-deposition_temperature_Kelvin: 300
-min_velocity_metres_per_second: 25
+deposition_height: 10  # Angstroms
+deposition_temperature: 300  # Kelvin
+min_velocity: 25  # metres per second
 num_deposited_per_iteration: 1
-relaxation_time_picoseconds: 0.1
-deposition_time_picoseconds: 0.4
+relaxation_time: 0.1  # picoseconds
+deposition_time: 0.4  # picoseconds
 substrate_xyz_file: settings/substrate.xyz
 max_sequential_failures: 5
 max_total_iterations: 10
@@ -15,12 +15,12 @@ velocity_distribution: gaussian
 velocity_distribution_parameters: [300, 1e-25, 0]  # temperature, atom weight, centre
 postprocessing:
     num_neighbours: [1, 9]  # min num neighbours, bonding distance
-    shift_to_origin: 1
+    shift_to_origin: True
 
 # 2. Driver settings
 driver_settings:
     name: LAMMPS
-    path_to_binary: /Users/martin/work/repos/lammps/src/lmp_serial
+    path_to_binary: /opt/homebrew/bin/lmp_serial
     path_to_input_template: settings/lammps_input_template.txt
     velocity_scaling_from_metres_per_second: 0.00001  # convert to Angstroms/fs
     timestep_scaling_from_picoseconds: 1000  # convert to femtoseconds

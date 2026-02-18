@@ -84,14 +84,14 @@ class Iteration:
         self.state.write(f"{self.deposition_filename}.pickle", include_velocities=False)
         if self.success:
             destination_directory = os.path.join(
-                DirectoriesEnum.SUCCESS.value, f"{self.iteration_number:03d}/"
+                DirectoriesEnum.SUCCESS.value, f"{self.iteration_number:04d}/"
             )
             self.pickle_location = os.path.join(
-                destination_directory, f"deposition{self.iteration_number:03d}.pickle"
+                destination_directory, f"deposition{self.iteration_number:04d}.pickle"
             )
         else:
             destination_directory = os.path.join(
-                DirectoriesEnum.FAILED.value, f"{self.iteration_number:03d}/"
+                DirectoriesEnum.FAILED.value, f"{self.iteration_number:04d}/"
             )
         logging.info(
             f"moving data for iteration {self.iteration_number} to {destination_directory}"

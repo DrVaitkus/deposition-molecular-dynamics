@@ -15,3 +15,7 @@ deposition.egg-info
 
 # Sphinx documentation output
 html-docs
+
+# swap files
+**.swp
+

@@ -10,25 +10,28 @@ class DirectoriesEnum(Enum):
 
 
 class SettingsEnum(Enum):
-    """Map strings to settings variables"""
+    """
+    Map strings to settings variables
+    NOTE: enum strings MUST match parameters in Settings object
+    """
 
     COMMAND_PREFIX = "command_prefix"
     DEPOSITION_ELEMENT = "deposition_element"
-    DEPOSITION_HEIGHT = "deposition_height_Angstroms"
-    DEPOSITION_TEMPERATURE = "deposition_temperature_Kelvin"
-    DEPOSITION_TIME = "deposition_time_picoseconds"
+    DEPOSITION_HEIGHT = "deposition_height"  # Angstroms
+    DEPOSITION_TEMPERATURE = "deposition_temperature"  # Kelvin
+    DEPOSITION_TIME = "deposition_time"  # picoseconds
     DEPOSITION_TYPE = "deposition_type"
     DRIVER_SETTINGS = "driver_settings"
     LOG_FILENAME = "log_filename"
     MAX_SEQUENTIAL_FAILURES = "max_sequential_failures"
     MAX_TOTAL_ITERATIONS = "max_total_iterations"
-    MIN_VELOCITY = "min_velocity_metres_per_second"
+    MIN_VELOCITY = "min_velocity" # metres per second
     MOLECULE_XYZ_FILE = "molecule_xyz_file"
     NUM_DEPOSITED_PER_ITERATION = "num_deposited_per_iteration"
     POSITION_DISTRIBUTION = "position_distribution"
     POSITION_DISTRIBUTION_PARAMS = "position_distribution_parameters"
     POSTPROCESSING = "postprocessing"
-    RELAXATION_TIME = "relaxation_time_picoseconds"
+    RELAXATION_TIME = "relaxation_time"  # picoseconds
     SIMULATION_CELL = "simulation_cell"
     STRICT_POSTPROCESSING = "strict_postprocessing"
     SUBSTRATE_XYZ_FILE = "substrate_xyz_file"

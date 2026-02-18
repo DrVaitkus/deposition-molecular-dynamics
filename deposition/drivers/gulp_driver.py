@@ -4,6 +4,7 @@ import numpy as np
 
 from deposition import io, physics
 from deposition.drivers import MolecularDynamicsDriver
+from deposition.enums import SettingsEnum
 from deposition.state import State
 
 
@@ -139,7 +140,7 @@ class GULPDriver(MolecularDynamicsDriver):
             template_values.update(
                 {
                     "production_time_picoseconds": self.settings[
-                        "relaxation_time_picoseconds"
+                        SettingsEnum.RELAXATION_TIME.value
                     ]
                 }
             )
@@ -147,7 +148,7 @@ class GULPDriver(MolecularDynamicsDriver):
             template_values.update(
                 {
                     "production_time_picoseconds": self.settings[
-                        "deposition_time_picoseconds"
+                        SettingsEnum.DEPOSITION_TIME.value
                     ]
                 }
             )
