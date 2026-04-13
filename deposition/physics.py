@@ -38,7 +38,7 @@ def get_canonical_variance(num_atoms, temperature=300.0):
 
 
 def normal_distribution(mean, sigma):
-    """Uses the `numpy.random.normal` function to generate random values from a normal distribution.
+    """Uses the `numpy.random.normal` to generate random values from a normal distribution.
 
     Arguments:
         mean (float): the centre of the normal distribution
@@ -62,9 +62,7 @@ def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
         random velocity in metres per second (float)
     """
     if particle_mass > 0:
-        sigma = math.sqrt(
-            (CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass
-        )
+        sigma = math.sqrt((CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass)
         return normal_distribution(mean, sigma)
     logging.warning(
         "Particle mass in velocity calculation is zero, returning zero velocity. Note: this could be "
@@ -86,9 +84,7 @@ def get_centre_of_mass(coordinates, elements):
             - masses (list): list of the atomic masses in kg
     """
     atoms = [Element(e) for e in elements]
-    masses = [
-        CONSTANTS["AtomicMassUnit_kg"] * float(atom.atomic_mass) for atom in atoms
-    ]
+    masses = [CONSTANTS["AtomicMassUnit_kg"] * float(atom.atomic_mass) for atom in atoms]
     centre_of_mass_list = [
         mass * coordinate for mass, coordinate in zip(masses, coordinates, strict=True)
     ]

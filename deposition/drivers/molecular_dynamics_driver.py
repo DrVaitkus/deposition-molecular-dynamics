@@ -14,9 +14,7 @@ class MolecularDynamicsDriver:
         "name": str,
         "path_to_binary": os.path.exists,
         "path_to_input_template": os.path.exists,
-        "velocity_scaling_from_metres_per_second": And(
-            Or(int, float), Use(strictly_positive)
-        ),
+        "velocity_scaling_from_metres_per_second": And(Or(int, float), Use(strictly_positive)),
         Optional("command_line_args", default=""): str,
     }
 

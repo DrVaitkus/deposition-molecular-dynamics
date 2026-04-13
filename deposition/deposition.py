@@ -1,3 +1,9 @@
+"""Defines the deposition class and related functions.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 from deposition import io, utils
 from deposition.enums import DirectoriesEnum
 from deposition.iteration import Iteration
@@ -18,8 +24,10 @@ class Deposition:
     _status_file = "status.yaml"
     _initial_positions_pickle = "initial_positions.pickle"
 
-    def __init__(self, settings):
-        """Initialise the simulation cell and molecular dynamics driver. Read the status
+    def __init__(self, settings: dict) -> None:
+        """Initialises the Deposition class.
+
+        Initialises the simulation cell and molecular dynamics driver. Read the status
         of the deposition calculation from the status file if it is present.
 
         Arguments:
@@ -41,11 +49,8 @@ class Deposition:
             self.settings.relaxation_time,
         )
 
-    def initial_setup(self):
-        """Sets simulation parameters to their initial state and creates the required
-        directories. Note that this function only runs when no `status.yaml` file is
-        found in the current directory.
-        """
+    def initial_setup(self) -> None:
+        """When no `status.yaml` is present set up initial state and directories."""
         self.status = Status(
             iteration_number=1,
             sequential_failures=0,
@@ -57,7 +62,7 @@ class Deposition:
         io.make_directories(tuple([directory.value for directory in DirectoriesEnum]))
         self.status.write(self._status_file)
 
-    def run(self):
+    def run(self) -> None:
         """Executes the main deposition loop using the :class:`Iteration` class.
 
         Returns:

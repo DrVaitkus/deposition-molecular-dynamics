@@ -11,22 +11,16 @@ class Settings:
         self.command_prefix = settings[SettingsEnum.COMMAND_PREFIX.value]
         self.deposition_element = settings[SettingsEnum.DEPOSITION_ELEMENT.value]
         self.deposition_height = settings[SettingsEnum.DEPOSITION_HEIGHT.value]
-        self.deposition_temperature = settings[
-            SettingsEnum.DEPOSITION_TEMPERATURE.value
-        ]
+        self.deposition_temperature = settings[SettingsEnum.DEPOSITION_TEMPERATURE.value]
         self.deposition_time = settings[SettingsEnum.DEPOSITION_TIME.value]
         self.deposition_type = settings[SettingsEnum.DEPOSITION_TYPE.value]
         self.driver_settings = settings[SettingsEnum.DRIVER_SETTINGS.value]
         self.log_filename = settings[SettingsEnum.LOG_FILENAME.value]
-        self.max_sequential_failures = settings[
-            SettingsEnum.MAX_SEQUENTIAL_FAILURES.value
-        ]
+        self.max_sequential_failures = settings[SettingsEnum.MAX_SEQUENTIAL_FAILURES.value]
         self.max_total_iterations = settings[SettingsEnum.MAX_TOTAL_ITERATIONS.value]
         self.min_velocity = settings[SettingsEnum.MIN_VELOCITY.value]
         self.molecule_xyz_file = settings[SettingsEnum.MOLECULE_XYZ_FILE.value]
-        self.num_deposited_per_iteration = settings[
-            SettingsEnum.NUM_DEPOSITED_PER_ITERATION.value
-        ]
+        self.num_deposited_per_iteration = settings[SettingsEnum.NUM_DEPOSITED_PER_ITERATION.value]
         self.position_distribution = settings[SettingsEnum.POSITION_DISTRIBUTION.value]
         self.position_distribution_parameters = settings[
             SettingsEnum.POSITION_DISTRIBUTION_PARAMS.value
@@ -46,9 +40,9 @@ class Settings:
         """Performs additional validation not covered by the schema."""
         # check that required options for the deposition type are present
         for requirement in input_schema.DepositionTypeEnum[self.deposition_type].value:
-            assert (
-                requirement in settings.keys()
-            ), f"{requirement} required in {self.deposition_type} deposition"
+            assert requirement in settings.keys(), (
+                f"{requirement} required in {self.deposition_type} deposition"
+            )
 
         # check that the position distribution has valid parameters
         distributions.get_position_distribution(

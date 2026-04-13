@@ -55,9 +55,7 @@ def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_sc
         else:
             raise ValueError(f"unknown deposition type: {settings.deposition_type}")
 
-        new_coordinates = get_new_positions(
-            position_distribution, deposition_coordinates
-        )
+        new_coordinates = get_new_positions(position_distribution, deposition_coordinates)
         new_elements = deposition_elements
         new_velocities = get_new_velocities(
             velocity_distribution,
@@ -69,9 +67,7 @@ def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_sc
 
         state.coordinates = np.vstack((state.coordinates, new_coordinates))
         state.elements = state.elements + new_elements
-        state.velocities = np.vstack(
-            (state.velocities, new_velocities * velocity_scaling)
-        )
+        state.velocities = np.vstack((state.velocities, new_velocities * velocity_scaling))
 
     return state
 
@@ -132,8 +128,7 @@ def random_velocity(velocity_distribution, minimum_velocity, max_iterations=1000
 
 def get_new_positions(position_distribution, molecule_coordinates):
     """Randomly generates a position within the simulation cell on a plane at the
-    specified z_plane-coordinate and centres the
-    atom/molecule at this point.
+    specified z_plane-coordinate and centres the atom/molecule at this point.
 
     Arguments:
         position_distribution: functional form for obtaining the new position
@@ -142,7 +137,7 @@ def get_new_positions(position_distribution, molecule_coordinates):
 
     Returns:
         new_coordinates (np.array): state of the molecule placed at a randomly
-        generated position in the cell
+        generated position in the cell.
     """
     centre = molecule_coordinates - np.mean(molecule_coordinates, axis=0)
     new_coordinates = position_distribution.get_position() + centre
@@ -183,10 +178,9 @@ def get_new_velocities(
         for moment_of_inertia in moment_of_inertia_xyz
     ]
     tangential_velocities = [rotational_velocities * distance for distance in distances]
-    velocities = [
+    return [
         translational + tangential
         for translational, tangential in zip(
             translational_velocities, tangential_velocities, strict=True
         )
-    ]
-    return velocities
+    ]  # velocities

@@ -3,15 +3,17 @@ import itertools
 import logging
 import os
 import sys
+from collections.abc import Iterable
 from string import Template
 
 import numpy as np
 
 from deposition.enums import DirectoriesEnum
 from deposition.state import State
+from deposition.types import path
 
 
-def start_logging(log_filename):
+def start_logging(log_filename: path) -> None:
     """Starts logging to both stdout and given filename.
 
     Arguments:
@@ -22,8 +24,7 @@ def start_logging(log_filename):
     log_to_file = logging.FileHandler(log_filename)
     log_to_stdout = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter(
-        "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] "
-        "%(message)s",
+        "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
         datefmt="%a %d %b %Y %H:%M:%S",
     )
     log_to_file.setFormatter(formatter)
@@ -33,28 +34,28 @@ def start_logging(log_filename):
     logging.info(f"logging to {log_filename} and stdout")
 
 
-def make_directories(directory_names):
+def make_directories(directory_names: Iterable[path]) -> None:
     """Creates directories from a list of names and logs warning instead of error when
     directories already exist.
 
     Arguments:
-        directory_names (tuple): list of directory names to be created
+        directory_names (Iterable[path]): list of directory names to be created.
     """
     for name in directory_names:
         try:
             os.mkdir(name)
             logging.info(f"created directory '{name}'")
         except FileExistsError:
-            logging.warning(
-                f"directory '{name}' already exists, check for existing data"
-            )
+            logging.warning(f"directory '{name}' already exists, check for existing data")
             raise FileExistsError(
                 f"remove the following directories to proceed: {[directory.value for directory in DirectoriesEnum]}"
             )
 
 
-def throw_away_lines(iterator, n):
-    """A fast way to throw away data we don't need. Advance the iterator n-steps ahead.
+def throw_away_lines(iterator, n: int):
+    """A fast way to throw away data we don't need.
+
+    This function advances the iterator n-steps ahead.
     If n is None, consume entirely.
 
     Arguments:
@@ -68,12 +69,12 @@ def throw_away_lines(iterator, n):
         next(itertools.islice(iterator, n, n), None)
 
 
-def read_xyz(xyz_file, step=None):
+def read_xyz(xyz_file: path, step: int | None = None) -> State:
     """Reads data from either the first or last step of an XYZ file.
 
     Arguments:
         xyz_file (path): path to XYZ file
-        step (default=None): reads the final step when None, first step when
+        step (int | None): reads the final step when None, first step when
         equal to 1
 
     Returns:
@@ -97,8 +98,7 @@ def read_xyz(xyz_file, step=None):
         throw_away_lines(file, num_lines_to_skip)
         atom_data = [line.split() for ii, line in enumerate(file) if ii < num_atoms]
         coordinates = [
-            np.array([float(atom[1]), float(atom[2]), float(atom[3])])
-            for atom in atom_data
+            np.array([float(atom[1]), float(atom[2]), float(atom[3])]) for atom in atom_data
         ]
         elements = [atom[0] for atom in atom_data]
 

@@ -69,9 +69,7 @@ def check_input_file_syntax(driver):
         driver (MolecularDynamicsDriver): driver object with a schema dictionary
     """
     # regex matches any variable placeholder starting with the $ character, either ${with} or $without braces
-    template_key_regular_expression = (
-        r"[\$]([{]?[a-z_plane,A-Z][_,a-z_plane,A-Z,0-9]*[}]?)"
-    )
+    template_key_regular_expression = r"[\$]([{]?[a-z_plane,A-Z][_,a-z_plane,A-Z,0-9]*[}]?)"
     reserved_keywords = driver.get_reserved_keywords()
 
     with open(driver.settings["path_to_input_template"]) as file:
@@ -115,30 +113,20 @@ def check_input_file_syntax(driver):
 
 settings_schema = Schema(
     {
-        SettingsEnum.DEPOSITION_HEIGHT.value: And(
-            Or(int, float), Use(strictly_positive)
-        ),
-        SettingsEnum.DEPOSITION_TEMPERATURE.value: And(
-            Or(int, float), Use(strictly_positive)
-        ),
+        SettingsEnum.DEPOSITION_HEIGHT.value: And(Or(int, float), Use(strictly_positive)),
+        SettingsEnum.DEPOSITION_TEMPERATURE.value: And(Or(int, float), Use(strictly_positive)),
         SettingsEnum.DEPOSITION_TIME.value: And(Or(int, float), Use(strictly_positive)),
         SettingsEnum.DEPOSITION_TYPE.value: And(str, Use(allowed_deposition_types)),
         SettingsEnum.MAX_SEQUENTIAL_FAILURES.value: And(int, Use(strictly_positive)),
         SettingsEnum.MAX_TOTAL_ITERATIONS.value: And(int, Use(strictly_positive)),
         SettingsEnum.MIN_VELOCITY.value: And(Or(int, float), Use(strictly_positive)),
-        SettingsEnum.NUM_DEPOSITED_PER_ITERATION.value: And(
-            int, Use(strictly_positive)
-        ),
-        SettingsEnum.POSITION_DISTRIBUTION.value: And(
-            str, Use(allowed_position_distributions)
-        ),
+        SettingsEnum.NUM_DEPOSITED_PER_ITERATION.value: And(int, Use(strictly_positive)),
+        SettingsEnum.POSITION_DISTRIBUTION.value: And(str, Use(allowed_position_distributions)),
         SettingsEnum.RELAXATION_TIME.value: And(Or(int, float), Use(strictly_positive)),
         SettingsEnum.DRIVER_SETTINGS.value: dict,
         SettingsEnum.SIMULATION_CELL.value: dict,
         SettingsEnum.SUBSTRATE_XYZ_FILE.value: os.path.exists,
-        SettingsEnum.VELOCITY_DISTRIBUTION.value: And(
-            str, Use(allowed_velocity_distributions)
-        ),
+        SettingsEnum.VELOCITY_DISTRIBUTION.value: And(str, Use(allowed_velocity_distributions)),
         Optional(SettingsEnum.COMMAND_PREFIX.value, default=""): str,
         Optional(SettingsEnum.DEPOSITION_ELEMENT.value, default=None): str,
         Optional(SettingsEnum.LOG_FILENAME.value, default="deposition.log"): str,

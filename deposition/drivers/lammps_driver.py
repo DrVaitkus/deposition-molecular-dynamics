@@ -71,21 +71,15 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         scaling = self.settings["timestep_scaling_from_picoseconds"]
 
         if iteration_stage == "relaxation":
-            relaxation_num_steps = (
-                self.settings[SettingsEnum.RELAXATION_TIME.value] * scaling
-            )
+            relaxation_num_steps = self.settings[SettingsEnum.RELAXATION_TIME.value] * scaling
             template_values.update({"num_steps": int(relaxation_num_steps)})
         elif iteration_stage == "deposition":
-            deposition_num_steps = (
-                self.settings[SettingsEnum.DEPOSITION_TIME.value] * scaling
-            )
+            deposition_num_steps = self.settings[SettingsEnum.DEPOSITION_TIME.value] * scaling
             template_values.update({"num_steps": int(deposition_num_steps)})
 
         # Write input file using template
         template_values.update({"filename": filename})
-        template_values.update(
-            {"elements_in_potential": self.settings["elements_in_potential"]}
-        )
+        template_values.update({"elements_in_potential": self.settings["elements_in_potential"]})
 
         io.write_file_using_template(
             input_filename, self.settings["path_to_input_template"], template_values
@@ -95,9 +89,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         list_of_elements_in_potential = self.settings["elements_in_potential"].split()
         for element_index, element in enumerate(state.elements):
             if element in list_of_elements_in_potential:
-                state.elements[element_index] = (
-                    list_of_elements_in_potential.index(element) + 1
-                )
+                state.elements[element_index] = list_of_elements_in_potential.index(element) + 1
         element_integers = [int(element) for element in state.elements]
 
         # Set up indices for pandas dataframes
@@ -111,9 +103,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         charges_dataframe = pd.DataFrame(
             np.zeros(((len(state.elements)), 1)), index=atom_indices, columns=["q"]
         )
-        elements_dataframe = pd.DataFrame(
-            element_integers, index=atom_indices, columns=["type"]
-        )
+        elements_dataframe = pd.DataFrame(element_integers, index=atom_indices, columns=["type"])
         coordinates_dataframe = pd.DataFrame(
             state.coordinates, index=atom_indices, columns=["x", "y", "z"]
         )

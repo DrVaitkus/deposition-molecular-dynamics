@@ -94,12 +94,8 @@ def get_molecular_dynamics_driver(
     driver = driver_class(driver_settings, simulation_cell_full)
 
     input_schema.check_input_file_syntax(driver)
-    driver.settings.update(
-        {SettingsEnum.DEPOSITION_TIME.value: deposition_time_picoseconds}
-    )
-    driver.settings.update(
-        {SettingsEnum.RELAXATION_TIME.value: relaxation_time_picoseconds}
-    )
+    driver.settings.update({SettingsEnum.DEPOSITION_TIME.value: deposition_time_picoseconds})
+    driver.settings.update({SettingsEnum.RELAXATION_TIME.value: relaxation_time_picoseconds})
     logging.info(f"Using driver for {driver_name}")
 
     return driver
@@ -130,7 +126,9 @@ def generate_neighbour_list(simulation_cell, coordinates, bonding_distance_cutof
     return [len(atom_neighbours) for atom_neighbours in neighbours]  # neighbour_list
 
 
-def wrap_coordinates_in_z(simulation_cell, coordinates, percentage_of_box=80):
+def wrap_coordinates_in_z(
+    simulation_cell, coordinates: np.ndarray, percentage_of_box: float = 80.0
+):
     """Take cartesian state and wrap those at the top of the box back the main
     structure at the bottom of the box. This will set negative z_plane-state for those
     atoms which are wrapped.

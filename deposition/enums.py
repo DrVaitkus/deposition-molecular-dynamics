@@ -1,3 +1,9 @@
+"""Defines Enums for settings, status, states and so on.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 from enum import Enum
 
 
@@ -14,6 +20,7 @@ class SettingsEnum(Enum):
 
     NOTE: enum strings MUST match parameters in Settings object.
     """
+
     COMMAND_PREFIX = "command_prefix"
     DEPOSITION_ELEMENT = "deposition_element"
     DEPOSITION_HEIGHT = "deposition_height"  # Angstroms
@@ -24,7 +31,7 @@ class SettingsEnum(Enum):
     LOG_FILENAME = "log_filename"
     MAX_SEQUENTIAL_FAILURES = "max_sequential_failures"
     MAX_TOTAL_ITERATIONS = "max_total_iterations"
-    MIN_VELOCITY = "min_velocity" # metres per second
+    MIN_VELOCITY = "min_velocity"  # metres per second
     MOLECULE_XYZ_FILE = "molecule_xyz_file"
     NUM_DEPOSITED_PER_ITERATION = "num_deposited_per_iteration"
     POSITION_DISTRIBUTION = "position_distribution"

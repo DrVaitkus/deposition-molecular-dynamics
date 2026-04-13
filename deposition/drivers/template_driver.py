@@ -31,9 +31,7 @@ class TemplateDriver(MolecularDynamicsDriver):
             reserved_keywords=self.reserved_keywords,
         )
 
-    def write_inputs(
-        self, filename, coordinates, elements, velocities, iteration_stage
-    ):
+    def write_inputs(self, filename, coordinates, elements, velocities, iteration_stage):
         def write_coordinates(file, coordinates):
             pass
 

@@ -24,6 +24,7 @@ def run(name, state, simulation_cell, parameters=None, dry_run=False):
 
     if not dry_run:
         return routine.run()
+    return None
 
 
 class NumNeighboursCheck:
@@ -43,9 +44,9 @@ class NumNeighboursCheck:
     def __init__(self, state, simulation_cell, parameters):
         if parameters is None:
             parameters = self.default_parameters
-        assert (
-            len(parameters) == self.num_parameters
-        ), f"{self.__class__} requires {self.num_parameters} argument(s)"
+        assert len(parameters) == self.num_parameters, (
+            f"{self.__class__} requires {self.num_parameters} argument(s)"
+        )
         self.min_neighbours = float(parameters[0])
         self.bonding_cutoff = float(parameters[1])
         self.state = state

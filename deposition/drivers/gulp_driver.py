@@ -132,19 +132,11 @@ class GULPDriver(MolecularDynamicsDriver):
 
         if iteration_stage == "relaxation":
             template_values.update(
-                {
-                    "production_time_picoseconds": self.settings[
-                        SettingsEnum.RELAXATION_TIME.value
-                    ]
-                }
+                {"production_time_picoseconds": self.settings[SettingsEnum.RELAXATION_TIME.value]}
             )
         elif iteration_stage == "deposition":
             template_values.update(
-                {
-                    "production_time_picoseconds": self.settings[
-                        SettingsEnum.DEPOSITION_TIME.value
-                    ]
-                }
+                {"production_time_picoseconds": self.settings[SettingsEnum.DEPOSITION_TIME.value]}
             )
 
         template_values.update({"filename": filename})
@@ -236,16 +228,12 @@ class GULPDriver(MolecularDynamicsDriver):
                 num_atoms = int(num_atoms_str)
 
             num_header_lines = 2
-            num_lines_per_step = num_header_lines + (
-                len(available_types) * (num_atoms + 1)
-            )
+            num_lines_per_step = num_header_lines + (len(available_types) * (num_atoms + 1))
             num_lines_in_file = sum(1 for _ in open(trajectory_file))
             num_steps = (num_lines_in_file - num_header_lines) / num_lines_per_step
             if step_number is None:
                 step_number = num_steps
-            num_lines_to_skip = int(
-                num_header_lines + (num_lines_per_step * (step_number - 1))
-            )
+            num_lines_to_skip = int(num_header_lines + (num_lines_per_step * (step_number - 1)))
 
             with open(trajectory_file) as file:
                 io.throw_away_lines(file, num_lines_to_skip)
@@ -259,9 +247,7 @@ class GULPDriver(MolecularDynamicsDriver):
                     for jj, value in enumerate(atom_data):
                         data[ii, jj] = value
 
-            return data[
-                :, ~np.isnan(data).all(axis=0)
-            ]  # delete redundant columns of NaN values
+            return data[:, ~np.isnan(data).all(axis=0)]  # delete redundant columns of NaN values
 
         coordinates, elements, _ = io.read_xyz(f"{filename}.xyz")
         velocities = get_data_from_trajectory_file(f"{filename}.trg", "Velocities")

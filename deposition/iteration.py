@@ -118,13 +118,13 @@ class Iteration:
             logging.warning("post-processing check failed")
             logging.warning(warning)
             if self.settings.strict_postprocessing:
-                raise RuntimeError(warning)
+                raise RuntimeError(warning) from warning
             self.success = False
 
     def call_process(self, filename):
         """Run the molecular dynamics software for this phase of the iteration."""
         command_template = Template(self.driver.command)
-        command_template_values = dict()
+        command_template_values: dict = {}
         command_template_values["prefix"] = self.settings.command_prefix
         command_template_values["binary"] = self.driver.binary
         command_template_values["arguments"] = self.driver.settings["command_line_args"]
