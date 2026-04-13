@@ -19,6 +19,7 @@ from . import (
     settings,
     state,
     status,
+    types,
     utils,
 )
 from .deposition import Deposition
