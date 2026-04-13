@@ -13,16 +13,19 @@ Define physical constants of the universe used by other functions.
 """
 
 
-def get_canonical_variance(num_atoms, temperature=300.0):
-    """The dependence of the temperature variance in the Nose-Hoover thermostat on the number of atoms and the temperature
-    of the system has been studied by `Holian et al.`_ This function implements Equation 6 from this paper
+def get_canonical_variance(num_atoms: int, temperature: float = 300.0) -> float:
+    r"""Get the canoncial variance of a Nose-Hoover thermostat.
+
+    The dependence of the temperature variance in the Nose-Hoover thermostat on
+    the number of atoms and the temperature of the system has been studied by
+    `Holian et al.`_ This function implements Equation 6 from this paper
 
     .. math::
 
        \\sigma^2(d, T, N) = \\frac{2}{d} \\frac{T^2}{N}
 
-    where :math:`\\sigma^2` is the variance, `d` is the number of dimensions, `T` is the temperature, and `N` is the
-    number of atoms.
+    where :math:`\\sigma^2` is the variance, `d` is the number of
+    dimensions, `T` is the temperature, and `N` is the number of atoms.
 
     Arguments:
         num_atoms (int): the number of atoms in the simulation
@@ -37,7 +40,7 @@ def get_canonical_variance(num_atoms, temperature=300.0):
     return (2 * pow(temperature, 2)) / (num_dimensions * num_atoms)
 
 
-def normal_distribution(mean, sigma):
+def normal_distribution(mean: float, sigma: float) -> float:
     """Uses the `numpy.random.normal` to generate random values from a normal distribution.
 
     Arguments:
@@ -50,7 +53,9 @@ def normal_distribution(mean, sigma):
     return np.random.normal(loc=mean, scale=sigma)
 
 
-def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
+def velocity_from_normal_distribution(
+    gas_temperature: float, particle_mass: float, mean: float = 0.0
+) -> float:
     """Return a velocity in metres per second randomly selected from a normal distribution.
 
     Arguments:
@@ -71,15 +76,15 @@ def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
     return 0
 
 
-def get_centre_of_mass(coordinates, elements):
+def get_centre_of_mass(coordinates: np.ndarray, elements: list) -> tuple[np.array, list]:
     """Calculates the centre of mass.
 
     Arguments:
-        coordinates (array): state of the atoms
+        coordinates (np.ndarray): state of the atoms
         elements (list): list of str with element names
 
     Returns:
-        centre_of_mass, masses (tuple)
+        centre_of_mass, masses (tuple)>
             - centre_of_mass (array): xyz coordinate of the centre of mass
             - masses (list): list of the atomic masses in kg
     """
@@ -92,7 +97,7 @@ def get_centre_of_mass(coordinates, elements):
     return centre_of_mass, masses
 
 
-def get_moment_of_inertia(coordinates, elements):
+def get_moment_of_inertia(coordinates: np.ndarray, elements: list) -> np.ndarray:
     """Calculates the moment of inertia.
 
     Arguments:

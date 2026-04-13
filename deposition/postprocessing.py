@@ -19,8 +19,8 @@ def run(name, state, simulation_cell, parameters=None, dry_run=False):
     try:
         postprocessing_class = PostProcessingEnum[name].value
         routine = postprocessing_class(state, simulation_cell, parameters)
-    except KeyError:
-        raise ValueError(f"unknown post processing routine {name}")
+    except KeyError as bad_routine:
+        raise ValueError(f"unknown post processing routine {name}") from bad_routine
 
     if not dry_run:
         return routine.run()
@@ -28,8 +28,10 @@ def run(name, state, simulation_cell, parameters=None, dry_run=False):
 
 
 class NumNeighboursCheck:
-    """Assess the number of neighbours of all simulated atoms to check that everything is
-    bonded together and there are no isolated regions.
+    """Class for checking the number of neighbours.
+
+    Assess the number of neighbours of all simulated atoms to check that
+    everything is bonded together and there are no isolated regions.
 
     Parameters:
         - min_neighbours (`int`)
@@ -52,7 +54,7 @@ class NumNeighboursCheck:
         self.state = state
         self.simulation_cell = simulation_cell
 
-    def run(self):
+    def run(self) -> State:
         neighbour_list = generate_neighbour_list(
             self.simulation_cell, self.state.coordinates, self.bonding_cutoff
         )
@@ -69,11 +71,12 @@ class ShiftToOrigin:
     def __init__(self, state, simulation_cell, parameters):
         if parameters is None:
             parameters = self.default_parameters
-        assert type(parameters) is bool, "shift to origin routine must be True or False"
+        if not isinstance(parameters, bool):
+            raise TypeError("shift to origin routine must be True or False")
         self.state = state
         self.simulation_cell = simulation_cell
 
-    def run(self):
+    def run(self) -> State:
         """Moves the given state back to the origin at (0, 0, 0)."""
         full_simulation_cell = get_simulation_cell(self.simulation_cell)
         wrapped = wrap_coordinates_in_z(full_simulation_cell, self.state.coordinates)

@@ -35,8 +35,10 @@ def start_logging(log_filename: path) -> None:
 
 
 def make_directories(directory_names: Iterable[path]) -> None:
-    """Creates directories from a list of names and logs warning instead of error when
-    directories already exist.
+    """Make the directories given an iterable of names.
+
+    Creates directories from a list of names and logs warnings
+    instead of returning an error when directories already exist.
 
     Arguments:
         directory_names (Iterable[path]): list of directory names to be created.
@@ -52,7 +54,7 @@ def make_directories(directory_names: Iterable[path]) -> None:
             )
 
 
-def throw_away_lines(iterator, n: int):
+def throw_away_lines(iterator, n: int) -> None:
     """A fast way to throw away data we don't need.
 
     This function advances the iterator n-steps ahead.

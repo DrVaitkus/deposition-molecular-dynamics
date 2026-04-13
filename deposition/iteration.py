@@ -98,7 +98,7 @@ class Iteration:
         shutil.rmtree(DirectoriesEnum.WORKING.value)
         os.mkdir(DirectoriesEnum.WORKING.value)
 
-    def run_postprocessing(self):
+    def run_postprocessing(self) -> None:
         """Runs postprocessing routines on the final state of the deposition phase."""
         if self.settings.postprocessing is None:
             self.success = True

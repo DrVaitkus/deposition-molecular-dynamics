@@ -21,7 +21,7 @@ class FixedPositionDistribution:
     num_arguments = 2
     default_arguments = (0.0, 0.0)
 
-    def __init__(self, polygon_coordinates: np.ndarray, z, arguments):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments):
         if arguments is None:
             arguments = self.default_arguments
         assert len(arguments) == self.num_arguments, (
@@ -43,7 +43,7 @@ class UniformPositionDistribution:
     num_arguments = 0
     _max_iterations = 10000
 
-    def __init__(self, polygon_coordinates, z, arguments=None):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None):
         self.polygon_coordinates = polygon_coordinates
         self.z = z
 
@@ -79,7 +79,8 @@ class FixedVelocityDistribution:
         self.vy = float(arguments[1])
         self.vz = float(arguments[2])
 
-    def get_velocity(self):
+    def get_velocity(self) -> tuple[float, float, float]:
+        """Returns the velocity components."""
         return self.vx, self.vy, self.vz
 
 
@@ -102,13 +103,15 @@ class GaussianVelocityDistribution:
         self.particle_mass = float(arguments[1])
         self.mean = arguments = float(arguments[2])
 
-    def get_single_velocity(self):
+    def get_single_velocity(self) -> float:
+        """Returns a single velocity from the distribution."""
         sigma = math.sqrt(
             (physics.CONSTANTS["BoltzmannConstant"] * self.gas_temperature) / self.particle_mass
         )
         return np.random.normal(loc=self.mean, scale=sigma)
 
-    def get_velocity(self):
+    def get_velocity(self) -> tuple[float, float, float]:
+        """Returns the velocity components."""
         vx = self.get_single_velocity()
         vy = self.get_single_velocity()
         vz = self.get_single_velocity()
@@ -149,8 +152,8 @@ def get_position_distribution(
     try:
         position_class = PositionDistributionEnum[name].value
         return position_class(polygon_coordinates, z_plane, arguments)
-    except KeyError:
-        raise ValueError(f"unknown position distribution: {name}")
+    except KeyError as bad_key:
+        raise ValueError(f"unknown position distribution: {name}") from bad_key
 
 
 def get_velocity_distribution(
@@ -168,5 +171,5 @@ def get_velocity_distribution(
     try:
         velocity_class = VelocityDistributionEnum[name].value
         return velocity_class(arguments)
-    except KeyError:
-        raise ValueError(f"unknown velocity distribution: {name}")
+    except KeyError as bad_key:
+        raise ValueError(f"unknown velocity distribution: {name}") from bad_key
