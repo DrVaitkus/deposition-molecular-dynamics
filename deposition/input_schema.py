@@ -61,14 +61,15 @@ def reserved_keyword(keyword):
 def check_input_file_syntax(driver):
     """Validates the syntax of the input file template.
 
-    Variables specified by `${var}` style notation are found and checked for mismatched delimiters. Errors and warnings
-    are provided when there is a mismatch between the keys provided in the settings and the variables specified in the
-    template file.
+    Variables specified by `${var}` style notation are found and checked for mismatched
+    delimiters. Errors and warnings are provided when there is a mismatch between the
+    keys provided in the settings and the variables specified in the template file.
 
     Arguments:
         driver (MolecularDynamicsDriver): driver object with a schema dictionary
     """
-    # regex matches any variable placeholder starting with the $ character, either ${with} or $without braces
+    # regex matches any variable placeholder starting with
+    # the $ character, either ${with} or $without braces
     template_key_regular_expression = r"[\$]([{]?[a-z_plane,A-Z][_,a-z_plane,A-Z,0-9]*[}]?)"
     reserved_keywords = driver.get_reserved_keywords()
 
@@ -102,10 +103,11 @@ def check_input_file_syntax(driver):
 
     # check for leftover keys in the input settings that are not used in the template
     schema_keys = [k.schema if type(k) is Optional else k for k in driver.schema.schema]
-    unused_keys: list = []
-    for key in driver.settings:
-        if key not in template_keys and key not in schema_keys:
-            unused_keys.append(key)
+
+    unused_keys: list = [
+        key for key in driver.settings if key not in template_keys and key not in schema_keys
+    ]
+
     if len(unused_keys) > 0:
         logging.warning("unused keys detected in input file:")
         [logging.warning(f"- {key}") for key in unused_keys]
@@ -150,20 +152,25 @@ simulation_cell_schema = Schema(
 )
 
 
-def get_settings_schema():
-    """A list of the required and optional settings for the simulation. These settings control the type and nature of the
-    deposition to be simulated.
+def get_settings_schema() -> Schema:
+    """Return the settings schema.
 
-    Note that settings for the :meth:`simulation cell <deposition.input_schema.get_simulation_cell_schema>` and
-    molecular dynamics :ref:`driver <drivers>` must also be provided.
+    A list of the required and optional settings for the simulation.
+    These settings control the type and nature of the deposition to be simulated.
+
+    Note that settings for the
+    :meth:`simulation cell <deposition.input_schema.get_simulation_cell_schema>`
+    and molecular dynamics :ref:`driver <drivers>` must also be provided.
 
     A full list of required settings is given :ref:`here <settings>`.
     """
     return settings_schema
 
 
-def get_simulation_cell_schema():
-    """Input schema for the parameters which define the periodic cell. Lengths are in
+def get_simulation_cell_schema() -> Schema:
+    """Return the simulation cell schema.
+
+    Input schema for the parameters which define the periodic cell. Lengths are in
     Angstroms and angles are in degrees.
 
     Example::
@@ -175,4 +182,4 @@ def get_simulation_cell_schema():
         beta: 90  # degrees
         gamma: 90 # degrees
     """
-    return get_simulation_cell_schema
+    return simulation_cell_schema
