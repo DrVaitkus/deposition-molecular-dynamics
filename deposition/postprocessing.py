@@ -3,13 +3,11 @@ from enum import Enum
 import numpy as np
 
 from deposition.state import State
-from deposition.utils import (generate_neighbour_list, get_simulation_cell,
-                              wrap_coordinates_in_z)
+from deposition.utils import generate_neighbour_list, get_simulation_cell, wrap_coordinates_in_z
 
 
 def run(name, state, simulation_cell, parameters=None, dry_run=False):
-    """
-    Runs the postprocessing check on the provided structural data.
+    """Runs the postprocessing check on the provided structural data.
 
     Args:
         name: the string referring to the check
@@ -29,8 +27,7 @@ def run(name, state, simulation_cell, parameters=None, dry_run=False):
 
 
 class NumNeighboursCheck:
-    """
-    Assess the number of neighbours of all simulated atoms to check that everything is
+    """Assess the number of neighbours of all simulated atoms to check that everything is
     bonded together and there are no isolated regions.
 
     Parameters:
@@ -64,9 +61,7 @@ class NumNeighboursCheck:
 
 
 class ShiftToOrigin:
-    """
-    Relocates the entire atomic structure to the origin (0, 0, 0) at the end of each iteration
-    """
+    """Relocates the entire atomic structure to the origin (0,0,0) at the end of each iteration."""
 
     default_parameters = True
 
@@ -78,7 +73,7 @@ class ShiftToOrigin:
         self.simulation_cell = simulation_cell
 
     def run(self):
-        """Moves the given state back to the origin at (0, 0, 0)"""
+        """Moves the given state back to the origin at (0, 0, 0)."""
         full_simulation_cell = get_simulation_cell(self.simulation_cell)
         wrapped = wrap_coordinates_in_z(full_simulation_cell, self.state.coordinates)
         minima = np.min(wrapped, axis=0)
@@ -87,7 +82,7 @@ class ShiftToOrigin:
 
 
 class PostProcessingEnum(Enum):
-    """Map strings to postprocessing routines"""
+    """Map strings to postprocessing routines."""
 
     num_neighbours = NumNeighboursCheck
     shift_to_origin = ShiftToOrigin

@@ -23,8 +23,7 @@ class Status:
         self.last_updated = last_updated
 
     def write(self, filename):
-        """
-        Writes the current time, current iteration number, number of sequential
+        """Writes the current time, current iteration number, number of sequential
         failures, and the most recent saved state of the deposition simulation to
         `status.yaml`.
         """
@@ -34,7 +33,7 @@ class Status:
 
     @staticmethod
     def from_file(filename):
-        """Reads the status from the given file"""
+        """Reads the status from the given file."""
         try:
             with open(filename) as file:
                 status = yaml.safe_load(file)
@@ -49,7 +48,7 @@ class Status:
             raise FileNotFoundError(f"status file not found: {filename}")
 
     def as_dict(self):
-        """Returns the status as a dictionary"""
+        """Returns the status as a dictionary."""
         return {
             StatusEnum.ITERATION_NUMBER.value: self.iteration_number,
             StatusEnum.SEQUENTIAL_FAILURES.value: self.sequential_failures,

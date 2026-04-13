@@ -7,8 +7,7 @@ from deposition.input_schema import DepositionTypeEnum
 
 
 def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_scaling):
-    """
-    Randomly generate new atoms based on the deposition settings and add them to the
+    """Randomly generate new atoms based on the deposition settings and add them to the
     existing structure.
 
     Arguments:
@@ -22,8 +21,7 @@ def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_sc
     """
 
     def get_surface_height(simulation_cell, coordinates, percentage_of_box=80):
-        """
-        Crude method to find the surface of the existing structure by finding the maximum
+        """Crude method to find the surface of the existing structure by finding the maximum
         z_plane-coordinate in the lower 80% of the simulation cell (by default).
         """
         box_height = simulation_cell["z_max"] - simulation_cell["z_min"]
@@ -45,7 +43,7 @@ def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_sc
         settings.velocity_distribution_parameters,
     )
 
-    logging.info(f"generating coordinates and velocities for deposited atom(s)")
+    logging.info("generating coordinates and velocities for deposited atom(s)")
     for ii in range(settings.num_deposited_per_iteration):
         if settings.deposition_type == DepositionTypeEnum.MONATOMIC.name:
             deposition_coordinates = [0, 0, 0]
@@ -79,8 +77,7 @@ def new_coordinates_and_velocities(settings, state, simulation_cell, velocity_sc
 
 
 def get_polygon_on_plane(simulation_cell, z_plane):
-    """
-    Get the state at the boundaries of the simulation cell at a particular z_plane
+    """Get the state at the boundaries of the simulation cell at a particular z_plane
     plane.
 
     Arguments:
@@ -89,7 +86,7 @@ def get_polygon_on_plane(simulation_cell, z_plane):
         Angstroms)
 
     Returns:
-        polygon_coordinates (np.array): state describing the plane
+        polygon_coordinates (np.array): state describing the plane.
     """
     # Note: order matters in this list. These points draw a matplotlib path.
     base_polygon_coordinates = [
@@ -106,13 +103,11 @@ def get_polygon_on_plane(simulation_cell, z_plane):
     ]
     relative_height = z_plane / (simulation_cell["z_max"] - simulation_cell["z_min"])
     relative_shift = simulation_cell["z_vector"] * relative_height
-    polygon_coordinates = np.add(base_polygon_coordinates, relative_shift[0:1])
-    return polygon_coordinates
+    return np.add(base_polygon_coordinates, relative_shift[0:1])  # polygon_coordinates
 
 
 def random_velocity(velocity_distribution, minimum_velocity, max_iterations=10000):
-    """
-    Randomly generate the velocity of the newly added particles(s) based on the
+    """Randomly generate the velocity of the newly added particles(s) based on the
     kinetic temperature and mass.
 
     Arguments:
@@ -124,7 +119,7 @@ def random_velocity(velocity_distribution, minimum_velocity, max_iterations=1000
     Returns:
         new_velocity (np.array): velocity of the newly added particle(s)
     """
-    for ii in range(max_iterations):
+    for _ in range(max_iterations):
         vx, vy, vz = velocity_distribution.get_velocity()
         vz = np.abs(vz)
         if vz > minimum_velocity:
@@ -136,8 +131,7 @@ def random_velocity(velocity_distribution, minimum_velocity, max_iterations=1000
 
 
 def get_new_positions(position_distribution, molecule_coordinates):
-    """
-    Randomly generates a position within the simulation cell on a plane at the
+    """Randomly generates a position within the simulation cell on a plane at the
     specified z_plane-coordinate and centres the
     atom/molecule at this point.
 
@@ -158,8 +152,7 @@ def get_new_positions(position_distribution, molecule_coordinates):
 def get_new_velocities(
     velocity_distribution, coordinates, elements, temperature, minimum_velocity
 ):
-    """
-    Randomly generate the velocity of the newly added molecule based on the kinetic
+    """Randomly generate the velocity of the newly added molecule based on the kinetic
     temperature and mass. All atoms in the molecule are given identical velocities.
 
     Arguments:
@@ -193,7 +186,7 @@ def get_new_velocities(
     velocities = [
         translational + tangential
         for translational, tangential in zip(
-            translational_velocities, tangential_velocities
+            translational_velocities, tangential_velocities, strict=True
         )
     ]
     return velocities

@@ -5,7 +5,7 @@ from deposition.enums import SettingsEnum
 
 
 class Settings:
-    """Class to hold all settings for the deposition calculation"""
+    """Class to hold all settings for the deposition calculation."""
 
     def __init__(self, settings):
         self.command_prefix = settings[SettingsEnum.COMMAND_PREFIX.value]
@@ -43,8 +43,7 @@ class Settings:
         self.validate(settings)
 
     def validate(self, settings):
-        """Performs additional validation not covered by the schema"""
-
+        """Performs additional validation not covered by the schema."""
         # check that required options for the deposition type are present
         for requirement in input_schema.DepositionTypeEnum[self.deposition_type].value:
             assert (
@@ -69,8 +68,7 @@ class Settings:
 
     @staticmethod
     def from_file(filename):
-        """
-        Read and validate a YAML file containing simulation settings.
+        """Read and validate a YAML file containing simulation settings.
 
         Arguments:
             filename (path): path to a YAML file containing settings for the simulation
@@ -86,7 +84,7 @@ class Settings:
         return settings
 
     def as_dict(self):
-        """Returns the settings as a dictionary"""
+        """Returns the settings as a dictionary."""
         return {
             key: value
             for key, value in self.__dict__.items()

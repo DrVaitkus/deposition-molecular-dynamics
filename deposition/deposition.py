@@ -6,8 +6,7 @@ from deposition.status import Status
 
 
 class Deposition:
-    """
-    The Deposition class controls the overall state of the calculation.
+    """The Deposition class controls the overall state of the calculation.
 
     This is the primary object which manages the simulation. It is responsible for
     creating the directories where calculation data will be kept, transferring data
@@ -20,8 +19,7 @@ class Deposition:
     _initial_positions_pickle = "initial_positions.pickle"
 
     def __init__(self, settings):
-        """
-        Initialise the simulation cell and molecular dynamics driver. Read the status
+        """Initialise the simulation cell and molecular dynamics driver. Read the status
         of the deposition calculation from the status file if it is present.
 
         Arguments:
@@ -44,8 +42,7 @@ class Deposition:
         )
 
     def initial_setup(self):
-        """
-        Sets simulation parameters to their initial state and creates the required
+        """Sets simulation parameters to their initial state and creates the required
         directories. Note that this function only runs when no `status.yaml` file is
         found in the current directory.
         """
@@ -61,13 +58,11 @@ class Deposition:
         self.status.write(self._status_file)
 
     def run(self):
-        """
-        Executes the main deposition loop using the :class:`Iteration` class.
+        """Executes the main deposition loop using the :class:`Iteration` class.
 
         Returns:
             exit_code (int): a code relating to the reason for the termination of the
         """
-
         while True:
             iteration = Iteration(self.driver, self.settings, self.status)
             success, self.status.pickle_location = iteration.run()

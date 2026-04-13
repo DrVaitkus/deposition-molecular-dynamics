@@ -11,14 +11,14 @@ from deposition.enums import SettingsEnum
 
 
 def get_simulation_cell(simulation_cell):
-    """
-    Additional geometry of the simulation cell is calculated using routines from the
+    """Additional geometry of the simulation cell is calculated using routines from the
     `pymatgen` module including bounds specification for use with LAMMPS and the cell
     vectors
 
     Arguments:
         simulation_cell (dict): simulation cell settings
             (see :meth:`format <deposition.schema_definitions.simulation_cell_schema>`)
+
     Return:
         simulation_cell (dict): updated simulation cell with additional geometry
     """
@@ -64,8 +64,7 @@ def get_molecular_dynamics_driver(
     deposition_time_picoseconds,
     relaxation_time_picoseconds,
 ):
-    """
-    Initialises one of the available molecular dynamics drivers. For more information
+    """Initialises one of the available molecular dynamics drivers. For more information
     about drivers see :ref:`here <drivers>`.
 
     Arguments:
@@ -107,8 +106,7 @@ def get_molecular_dynamics_driver(
 
 
 def generate_neighbour_list(simulation_cell, coordinates, bonding_distance_cutoff):
-    """
-    Create a neighbour list for the current state to check for isolated atoms
+    """Create a neighbour list for the current state to check for isolated atoms
     or molecules.
 
     Arguments:
@@ -125,17 +123,15 @@ def generate_neighbour_list(simulation_cell, coordinates, bonding_distance_cutof
     fake_elements = ["X" for _ in range(len(coordinates))]
     sites = [
         PeriodicSite(element, coordinate, lattice, coords_are_cartesian=True)
-        for element, coordinate in zip(fake_elements, coordinates)
+        for element, coordinate in zip(fake_elements, coordinates, strict=True)
     ]
     structure = IStructure.from_sites(sites)
     neighbours = structure.get_all_neighbors(bonding_distance_cutoff)
-    neighbour_list = [len(atom_neighbours) for atom_neighbours in neighbours]
-    return neighbour_list
+    return [len(atom_neighbours) for atom_neighbours in neighbours]  # neighbour_list
 
 
 def wrap_coordinates_in_z(simulation_cell, coordinates, percentage_of_box=80):
-    """
-    Take cartesian state and wrap those at the top of the box back the main
+    """Take cartesian state and wrap those at the top of the box back the main
     structure at the bottom of the box. This will set negative z_plane-state for those
     atoms which are wrapped.
 

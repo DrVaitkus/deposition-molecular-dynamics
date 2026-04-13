@@ -14,8 +14,7 @@ Define physical constants of the universe used by other functions.
 
 
 def get_canonical_variance(num_atoms, temperature=300.0):
-    """
-    The dependence of the temperature variance in the Nose-Hoover thermostat on the number of atoms and the temperature
+    """The dependence of the temperature variance in the Nose-Hoover thermostat on the number of atoms and the temperature
     of the system has been studied by `Holian et al.`_ This function implements Equation 6 from this paper
 
     .. math::
@@ -34,14 +33,12 @@ def get_canonical_variance(num_atoms, temperature=300.0):
 
     .. _Holian et al.: https://www.doi.org/10.1103/PhysRevE.52.2338
     """
-    num_dimensions = 3.0
-    canonical_variance = (2 * pow(temperature, 2)) / (num_dimensions * num_atoms)
-    return canonical_variance
+    num_dimensions: int = 3
+    return (2 * pow(temperature, 2)) / (num_dimensions * num_atoms)
 
 
 def normal_distribution(mean, sigma):
-    """
-    Uses the `numpy.random.normal` function to generate random values from a normal distribution.
+    """Uses the `numpy.random.normal` function to generate random values from a normal distribution.
 
     Arguments:
         mean (float): the centre of the normal distribution
@@ -54,8 +51,7 @@ def normal_distribution(mean, sigma):
 
 
 def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
-    """
-    Return a velocity in metres per second randomly selected from a normal distribution.
+    """Return a velocity in metres per second randomly selected from a normal distribution.
 
     Arguments:
         gas_temperature (float): temperature of the ideal gas in Kelvin
@@ -70,17 +66,15 @@ def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
             (CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass
         )
         return normal_distribution(mean, sigma)
-    else:
-        logging.warning(
-            "Particle mass in velocity calculation is zero, returning zero velocity. Note: this could be "
-            "due to a calculated zero for moment of inertia if you are depositing an on-axis molecule"
-        )
-        return 0
+    logging.warning(
+        "Particle mass in velocity calculation is zero, returning zero velocity. Note: this could be "
+        "due to a calculated zero for moment of inertia if you are depositing an on-axis molecule"
+    )
+    return 0
 
 
 def get_centre_of_mass(coordinates, elements):
-    """
-    Calculates the centre of mass
+    """Calculates the centre of mass.
 
     Arguments:
         coordinates (array): state of the atoms
@@ -96,15 +90,14 @@ def get_centre_of_mass(coordinates, elements):
         CONSTANTS["AtomicMassUnit_kg"] * float(atom.atomic_mass) for atom in atoms
     ]
     centre_of_mass_list = [
-        mass * coordinate for mass, coordinate in zip(masses, coordinates)
+        mass * coordinate for mass, coordinate in zip(masses, coordinates, strict=True)
     ]
     centre_of_mass = np.sum(centre_of_mass_list, axis=0) / np.sum(masses)
     return centre_of_mass, masses
 
 
 def get_moment_of_inertia(coordinates, elements):
-    """
-    Calculates the moment of inertia
+    """Calculates the moment of inertia.
 
     Arguments:
         coordinates (array): state of the atoms
@@ -117,7 +110,6 @@ def get_moment_of_inertia(coordinates, elements):
     centre_of_mass, masses = get_centre_of_mass(coordinates, elements)
     distances = [np.subtract(coordinate, centre_of_mass) for coordinate in coordinates]
     mass_distance_product = np.atleast_2d(
-        [mass * np.abs(distance) for mass, distance in zip(masses, distances)]
+        [mass * np.abs(distance) for mass, distance in zip(masses, distances, strict=True)]
     )
-    moment_of_inertia = np.sum(mass_distance_product, axis=0)
-    return moment_of_inertia
+    return np.sum(mass_distance_product, axis=0)  # moment_of_inertia

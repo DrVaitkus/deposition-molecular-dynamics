@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class DirectoriesEnum(Enum):
-    """Map strings to directory paths"""
+    """Map strings to directory paths."""
 
     FAILED = "failed"
     SUCCESS = "iterations"
@@ -10,11 +10,10 @@ class DirectoriesEnum(Enum):
 
 
 class SettingsEnum(Enum):
-    """
-    Map strings to settings variables
-    NOTE: enum strings MUST match parameters in Settings object
-    """
+    """Map strings to settings variables.
 
+    NOTE: enum strings MUST match parameters in Settings object.
+    """
     COMMAND_PREFIX = "command_prefix"
     DEPOSITION_ELEMENT = "deposition_element"
     DEPOSITION_HEIGHT = "deposition_height"  # Angstroms
@@ -40,7 +39,7 @@ class SettingsEnum(Enum):
 
 
 class SimulationCellEnum(Enum):
-    """Map strings to simulation cell parameters"""
+    """Map strings to simulation cell parameters."""
 
     A = "a"
     B = "b"
@@ -51,7 +50,7 @@ class SimulationCellEnum(Enum):
 
 
 class StateEnum(Enum):
-    """Map strings to simulation state information"""
+    """Map strings to simulation state information."""
 
     COORDINATES = "state"
     ELEMENTS = "elements"
@@ -59,7 +58,7 @@ class StateEnum(Enum):
 
 
 class StatusEnum(Enum):
-    """Map strings to status information"""
+    """Map strings to status information."""
 
     ITERATION_NUMBER = "iteration_number"
     LAST_UPDATED = "last_updated"

@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "Deposition"
-copyright = "2021, M. J. Cyster"
+copyright = "2021, M. J. Cyster"  # noqa: A001
 author = "M. J. Cyster"
 release = "1.0.0-beta"
 

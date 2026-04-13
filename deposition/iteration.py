@@ -10,8 +10,7 @@ from deposition.state import State
 
 
 class Iteration:
-    """
-    The `Iteration` class represents one cycle of relaxing the system before
+    """The `Iteration` class represents one cycle of relaxing the system before
     depositing an atom/molecule as specified
     by the input settings.
 
@@ -42,8 +41,7 @@ class Iteration:
         self.state = State.read_state(self.pickle_location)
 
     def run(self):
-        """
-        Runs one iteration of relaxation, deposition, and finalisation. Returns to
+        """Runs one iteration of relaxation, deposition, and finalisation. Returns to
         Deposition the success or failure of this iteration, and the location of
         the saved data from which to start the next iteration.
 
@@ -51,7 +49,6 @@ class Iteration:
              success, pickle_location (tuple)
                 - success (bool): whether the iteration passes the structural analyses
                 - pickle_location (path): where the resulting data has been saved
-
         """
         logging.info(f"starting iteration {self.iteration_number}")
         self.relaxation()
@@ -68,7 +65,8 @@ class Iteration:
 
     def deposition(self):
         """Runs the deposition phase of the iteration including the random addition
-        of new atoms/molecules."""
+        of new atoms/molecules.
+        """
         self.state = randomisation.new_coordinates_and_velocities(
             self.settings,
             self.state,
@@ -80,7 +78,7 @@ class Iteration:
         self.state = self.driver.read_outputs(self.deposition_filename)
 
     def finalisation(self):
-        """Finalises the iteration by moving the data to the appropriate directory"""
+        """Finalises the iteration by moving the data to the appropriate directory."""
         self.state.write(f"{self.deposition_filename}.pickle", include_velocities=False)
         if self.success:
             destination_directory = os.path.join(

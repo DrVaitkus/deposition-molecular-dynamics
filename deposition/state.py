@@ -5,7 +5,7 @@ from deposition.enums import StateEnum
 
 
 class State:
-    """Store coordinates, elements, and velocities for a set of atoms"""
+    """Store coordinates, elements, and velocities for a set of atoms."""
 
     def __init__(self, coordinates, elements, velocities):
         self.coordinates = coordinates
@@ -13,8 +13,7 @@ class State:
         self.velocities = velocities
 
     def write(self, pickle_location, include_velocities=True):
-        """
-        Write current state to a pickle file.
+        """Write current state to a pickle file.
 
         Arguments:
             pickle_location (path): path to save the pickled data to
@@ -31,10 +30,8 @@ class State:
 
     @staticmethod
     def read_state(pickle_location):
-        """
-        Reads current state of calculation from pickle file. The pickle file stores the
-        state, species (elements),
-        and velocities of all simulated atoms.
+        """Reads current state of calculation from pickle file. The pickle file stores the
+        state, species (elements), and velocities of all simulated atoms.
 
         Arguments:
             pickle_location (path): path read the pickled data from

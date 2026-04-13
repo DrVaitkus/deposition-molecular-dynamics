@@ -8,8 +8,7 @@ from deposition import physics
 
 
 def get_position_distribution(name, polygon_coordinates, z_plane, arguments=None):
-    """
-    Returns a position distribution object
+    """Returns a position distribution object.
 
     Arguments:
         name (str): string used to choose a particular distribution
@@ -28,8 +27,7 @@ def get_position_distribution(name, polygon_coordinates, z_plane, arguments=None
 
 
 def get_velocity_distribution(name, arguments=None):
-    """
-    Returns a velocity distribution object
+    """Returns a velocity distribution object.
 
     Arguments:
         name (str): string used to choose a particular distribution
@@ -49,7 +47,7 @@ def get_velocity_distribution(name, arguments=None):
 
 
 class FixedPositionDistribution:
-    """Returns the specified position"""
+    """Returns the specified position."""
 
     num_arguments = 2
     default_arguments = (0.0, 0.0)
@@ -70,7 +68,7 @@ class FixedPositionDistribution:
 
 
 class UniformPositionDistribution:
-    """Returns a uniformly random position within the polygon"""
+    """Returns a uniformly random position within the polygon."""
 
     num_arguments = 0
     _max_iterations = 10000
@@ -96,7 +94,7 @@ class UniformPositionDistribution:
 
 
 class FixedVelocityDistribution:
-    """Returns the specified velocity"""
+    """Returns the specified velocity."""
 
     num_arguments = 3
     default_arguments = (0.0, 0.0, -100.0)
@@ -116,8 +114,7 @@ class FixedVelocityDistribution:
 
 
 class GaussianVelocityDistribution:
-    """
-    Returns a velocity in metres per second randomly selected from a normal distribution.
+    """Returns a velocity in metres per second randomly selected from a normal distribution.
     Uses the gas_temperature (Kelvin), particle_mass (kg), and mean value (m/s).
     """
 
@@ -152,14 +149,14 @@ class GaussianVelocityDistribution:
 
 
 class PositionDistributionEnum(Enum):
-    """List of available position distribution classes"""
+    """List of available position distribution classes."""
 
     fixed = FixedPositionDistribution
     uniform = UniformPositionDistribution
 
 
 class VelocityDistributionEnum(Enum):
-    """List of available velocity distribution classes"""
+    """List of available velocity distribution classes."""
 
     fixed = FixedVelocityDistribution
     gaussian = GaussianVelocityDistribution

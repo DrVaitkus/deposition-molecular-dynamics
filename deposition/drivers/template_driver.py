@@ -3,13 +3,12 @@ import os
 from schema import Or
 
 from deposition import io
-from deposition.drivers.molecular_dynamics_driver import \
-    MolecularDynamicsDriver
+from deposition.drivers.molecular_dynamics_driver import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
 
 
 class TemplateDriver(MolecularDynamicsDriver):
-    """Template to help with writing new MolecularDynamicsDriver classes"""
+    """Template to help with writing new MolecularDynamicsDriver classes."""
 
     schema_dict = {
         "atomic_masses": list,

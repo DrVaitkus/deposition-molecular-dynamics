@@ -12,8 +12,7 @@ from deposition.state import State
 
 
 def start_logging(log_filename):
-    """
-    Starts logging to both stdout and given filename
+    """Starts logging to both stdout and given filename.
 
     Arguments:
         log_filename (path): where to write the log file
@@ -35,8 +34,7 @@ def start_logging(log_filename):
 
 
 def make_directories(directory_names):
-    """
-    Creates directories from a list of names and logs warning instead of error when
+    """Creates directories from a list of names and logs warning instead of error when
     directories already exist.
 
     Arguments:
@@ -46,7 +44,7 @@ def make_directories(directory_names):
         try:
             os.mkdir(name)
             logging.info(f"created directory '{name}'")
-        except FileExistsError as error:
+        except FileExistsError:
             logging.warning(
                 f"directory '{name}' already exists, check for existing data"
             )
@@ -56,8 +54,7 @@ def make_directories(directory_names):
 
 
 def throw_away_lines(iterator, n):
-    """
-    A fast way to throw away data we don't need. Advance the iterator n-steps ahead.
+    """A fast way to throw away data we don't need. Advance the iterator n-steps ahead.
     If n is None, consume entirely.
 
     Arguments:
@@ -72,8 +69,7 @@ def throw_away_lines(iterator, n):
 
 
 def read_xyz(xyz_file, step=None):
-    """
-    Reads data from either the first or last step of an XYZ file.
+    """Reads data from either the first or last step of an XYZ file.
 
     Arguments:
         xyz_file (path): path to XYZ file
@@ -107,14 +103,13 @@ def read_xyz(xyz_file, step=None):
         elements = [atom[0] for atom in atom_data]
 
     if len(atom_data) != num_atoms:
-        raise IOError(f"error reading step {step} of {xyz_file}")
+        raise OSError(f"error reading step {step} of {xyz_file}")
 
     return State(np.array(coordinates), elements, velocities=None)
 
 
 def write_file_using_template(output_filename, template_filename, template_values):
-    """
-    Uses the stdlib template module to perform find and replace in the provided
+    """Uses the stdlib template module to perform find and replace in the provided
     template and write a new file.
 
     Arguments:

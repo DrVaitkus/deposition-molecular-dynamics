@@ -5,13 +5,12 @@ from enum import Enum
 
 from schema import And, Optional, Or, Schema, SchemaError, Use
 
-from deposition.distributions import (PositionDistributionEnum,
-                                      VelocityDistributionEnum)
+from deposition.distributions import PositionDistributionEnum, VelocityDistributionEnum
 from deposition.enums import SettingsEnum, SimulationCellEnum
 
 
 class DepositionTypeEnum(Enum):
-    """List of explicitly allowed deposition types along with conditionally required settings"""
+    """List of explicitly allowed deposition types along with conditionally required settings."""
 
     MONATOMIC = ["deposition_element"]
     MOLECULE = ["molecule_xyz_file"]
@@ -28,7 +27,7 @@ def allowed_deposition_types(deposition_type):
 
 
 def allowed_position_distributions(selected_distribution):
-    """Checks that the position distribution is in the list of allowed distributions"""
+    """Checks that the position distribution is in the list of allowed distributions."""
     try:
         return PositionDistributionEnum[selected_distribution].name
     except KeyError:
@@ -38,7 +37,7 @@ def allowed_position_distributions(selected_distribution):
 
 
 def allowed_velocity_distributions(selected_distribution):
-    """Checks that the velocity distribution is in the list of allowed distributions"""
+    """Checks that the velocity distribution is in the list of allowed distributions."""
     try:
         return VelocityDistributionEnum[selected_distribution].name
     except KeyError:
@@ -60,8 +59,7 @@ def reserved_keyword(keyword):
 
 
 def check_input_file_syntax(driver):
-    """
-    Validates the syntax of the input file template.
+    """Validates the syntax of the input file template.
 
     Variables specified by `${var}` style notation are found and checked for mismatched delimiters. Errors and warnings
     are provided when there is a mismatch between the keys provided in the settings and the variables specified in the
@@ -80,7 +78,7 @@ def check_input_file_syntax(driver):
         template_matched_keys = re.findall(template_key_regular_expression, file.read())
 
     # check for mismatched delimiters
-    template_keys = list()
+    template_keys: list = []
     for key in template_matched_keys:
         if ("{" in key and "}" not in key) or ("}" in key and "{" not in key):
             raise SchemaError(f"incomplete variable specification: {key}")
@@ -97,16 +95,16 @@ def check_input_file_syntax(driver):
     for key in template_keys:
         if key in driver.settings.keys():  # a value has been provided
             continue
-        elif key in reserved_keywords:  # ignore reserved keywords
+        if key in reserved_keywords:  # ignore reserved keywords
             continue
-        elif key not in driver.settings.keys():  # unknown key
+        if key not in driver.settings.keys():  # unknown key
             raise SchemaError(
                 f"unknown key '{key}' present in input template but has no set value"
             )
 
     # check for leftover keys in the input settings that are not used in the template
     schema_keys = [k.schema if type(k) is Optional else k for k in driver.schema.schema]
-    unused_keys = list()
+    unused_keys: list = []
     for key in driver.settings:
         if key not in template_keys and key not in schema_keys:
             unused_keys.append(key)
@@ -165,8 +163,7 @@ simulation_cell_schema = Schema(
 
 
 def get_settings_schema():
-    """
-    A list of the required and optional settings for the simulation. These settings control the type and nature of the
+    """A list of the required and optional settings for the simulation. These settings control the type and nature of the
     deposition to be simulated.
 
     Note that settings for the :meth:`simulation cell <deposition.input_schema.get_simulation_cell_schema>` and
@@ -178,8 +175,7 @@ def get_settings_schema():
 
 
 def get_simulation_cell_schema():
-    """
-    Input schema for the parameters which define the periodic cell. Lengths are in
+    """Input schema for the parameters which define the periodic cell. Lengths are in
     Angstroms and angles are in degrees.
 
     Example::

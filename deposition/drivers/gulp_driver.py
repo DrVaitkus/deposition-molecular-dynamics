@@ -9,8 +9,7 @@ from deposition.state import State
 
 
 class GULPDriver(MolecularDynamicsDriver):
-    """
-    Class to interface between deposition package and GULP software.
+    """Class to interface between deposition package and GULP software.
 
     GULPDriver defines input variables required for the driver functions to work, as well as how to call GULP on the
     _command line, write GULP input files, and read GULP output files. The `schema_dict` defines additional
@@ -23,7 +22,7 @@ class GULPDriver(MolecularDynamicsDriver):
     """
     The names and types of additional inputs for GULP:
 
-    - GULP_LIB (path): location of GULP library folder containing provided potentials 
+    - GULP_LIB (path): location of GULP library folder containing provided potentials
     """
 
     reserved_keywords = [
@@ -58,15 +57,13 @@ class GULPDriver(MolecularDynamicsDriver):
         self.set_environment_variables()
 
     def set_environment_variables(self):
-        """
-        Uses the user provided value for GULP_LIB to set the environment variable. This is essential to use the
+        """Uses the user provided value for GULP_LIB to set the environment variable. This is essential to use the
         potentials which ship with GULP.
         """
         os.putenv("GULP_LIB", self.settings["GULP_LIB"])
 
     def write_inputs(self, filename, state, iteration_stage):
-        """
-        Write GULP input file for the next part of the deposition calculation.
+        """Write GULP input file for the next part of the deposition calculation.
 
         Arguments:
             filename (str): name to use for input files
@@ -75,8 +72,7 @@ class GULPDriver(MolecularDynamicsDriver):
         """
 
         def write_positions(filename, coordinates, elements):
-            """
-            Write positional data to the GULP input file.
+            """Write positional data to the GULP input file.
 
             Arguments:
                 filename (str): name to use for input files
@@ -85,12 +81,11 @@ class GULPDriver(MolecularDynamicsDriver):
             """
             with open(filename, "a") as file:
                 file.write("cartesian\n")
-                for atom, xyz in zip(elements, coordinates):
+                for atom, xyz in zip(elements, coordinates, strict=True):
                     file.write(f"{atom} {xyz[0]} {xyz[1]}, {xyz[2]}\n")
 
         def write_velocities(filename, velocities):
-            """
-            Write positional data to the GULP input file.
+            """Write positional data to the GULP input file.
 
             Arguments:
                 filename (str): name to use for input files
@@ -102,8 +97,7 @@ class GULPDriver(MolecularDynamicsDriver):
                     file.write(f"{ii} {v[0]} {v[1]} {v[2]}\n")
 
         def parameters_from_simulation_cell(simulation_cell):
-            """
-            Get a GULP friendly specification of the simulation cell from the dict.
+            """Get a GULP friendly specification of the simulation cell from the dict.
 
             Arguments:
                 simulation_cell (dict): specification of the size and shape of the simulation cell
@@ -171,8 +165,7 @@ class GULPDriver(MolecularDynamicsDriver):
 
     @staticmethod
     def get_thermostat_damping(num_atoms, temperature=300.0):
-        """
-        Calculate the required Nose-Hoover coupling constant which should give rise to canonical
+        """Calculate the required Nose-Hoover coupling constant which should give rise to canonical
         temperature fluctuations throughout the simulation. The values used are derived from a fitted power
         law equation. See Section 2.4.1 in my `thesis`_.
 
@@ -194,8 +187,7 @@ class GULPDriver(MolecularDynamicsDriver):
 
     @staticmethod
     def read_outputs(filename):
-        """
-        Read simulation data from GULP output files and return coordinate, element, and velocity data.
+        """Read simulation data from GULP output files and return coordinate, element, and velocity data.
 
         Arguments:
             filename (str): basename to use for reading output files
@@ -205,8 +197,7 @@ class GULPDriver(MolecularDynamicsDriver):
         """
 
         def get_data_types(trajectory_file):
-            """
-            Assess the type of data contained in the trajectory file.
+            """Assess the type of data contained in the trajectory file.
 
             Arguments:
                 trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
@@ -221,13 +212,11 @@ class GULPDriver(MolecularDynamicsDriver):
                         data_type = line.strip("#").strip()
                         if data_type in list_of_data_types:
                             break
-                        else:
-                            list_of_data_types.append(data_type)
+                        list_of_data_types.append(data_type)
             return list_of_data_types
 
         def get_data_from_trajectory_file(trajectory_file, data_type, step_number=None):
-            """
-            Read data from the trajectory file.
+            """Read data from the trajectory file.
 
             Arguments:
                 trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
@@ -270,10 +259,9 @@ class GULPDriver(MolecularDynamicsDriver):
                     for jj, value in enumerate(atom_data):
                         data[ii, jj] = value
 
-            data = data[
+            return data[
                 :, ~np.isnan(data).all(axis=0)
             ]  # delete redundant columns of NaN values
-            return data
 
         coordinates, elements, _ = io.read_xyz(f"{filename}.xyz")
         velocities = get_data_from_trajectory_file(f"{filename}.trg", "Velocities")

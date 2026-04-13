@@ -6,9 +6,7 @@ from deposition.input_schema import reserved_keyword, strictly_positive
 
 
 class MolecularDynamicsDriver:
-    """
-    Generic molecular dynamics driver class
-    """
+    """Generic molecular dynamics driver class."""
 
     _command = "${prefix} ${binary} ${arguments} < ${input_file} > ${output_file}"
 
@@ -61,5 +59,5 @@ class MolecularDynamicsDriver:
         self.binary = self.settings["path_to_binary"]
 
     def get_reserved_keywords(self):
-        """Returns a list of global and driver specific reserved keywords"""
+        """Returns a list of global and driver specific reserved keywords."""
         return self._reserved_keywords
