@@ -99,9 +99,11 @@ def read_xyz(xyz_file: path, step: int | None = None) -> State:
     with open(xyz_file) as file:
         throw_away_lines(file, num_lines_to_skip)
         atom_data = [line.split() for ii, line in enumerate(file) if ii < num_atoms]
-        coordinates = [
-            np.array([float(atom[1]), float(atom[2]), float(atom[3])]) for atom in atom_data
-        ]
+
+        # No need for repeated casting calls, simply set
+        # the dtype in the numpy array initialisation
+        coordinates = np.array([[atom[1], atom[2], atom[3]] for atom in atom_data], dtype=float)
+
         elements = [atom[0] for atom in atom_data]
 
     if len(atom_data) != num_atoms:
