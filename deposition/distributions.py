@@ -44,7 +44,7 @@ class UniformPositionDistribution:
     num_arguments: int = 0
     _max_iterations: int = 10000
 
-    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None) -> None:
         """Initialise uniform position distribution."""
         self.polygon_coordinates = polygon_coordinates
         self.z = z
@@ -72,7 +72,7 @@ class FixedVelocityDistribution:
     num_arguments = 3
     default_arguments = (0.0, 0.0, -100.0)
 
-    def __init__(self, arguments):
+    def __init__(self, arguments) -> None:
         """Initialise fixed velocity distribution."""
         if arguments is None:
             arguments = self.default_arguments
@@ -96,7 +96,8 @@ class GaussianVelocityDistribution:
     num_arguments = 3
     default_arguments = (300.0, 1e-25, 0.0)
 
-    def __init__(self, arguments):
+    def __init__(self, arguments) -> None:
+        """Initialise the Gaussian velocity distribution class."""
         if arguments is None:
             arguments = self.default_arguments
         if len(arguments) != self.num_arguments:
@@ -144,7 +145,7 @@ def get_position_distribution(
 
     Arguments:
         name (str): string used to choose a particular distribution
-        polygon_coordinates (np.ndarray): x,y-coordinates of the polygon within which to generate a position
+        polygon_coordinates (np.ndarray): x,y-coordinates of polygon to generate positions in
         z_plane (float): z-coordinate of the position
         arguments (list): arguments to pass to constructor
 

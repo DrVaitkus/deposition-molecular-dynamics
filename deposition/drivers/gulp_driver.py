@@ -55,7 +55,8 @@ class GULPDriver(MolecularDynamicsDriver):
     - gamma (float): used in template to specify simulation cell
     """
 
-    def __init__(self, driver_settings: dict, simulation_cell: dict):
+    def __init__(self, driver_settings: dict, simulation_cell: dict) -> None:
+        """Initialise the GULP driver."""
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -195,7 +196,7 @@ class GULPDriver(MolecularDynamicsDriver):
 
     @staticmethod
     def read_outputs(filename: str) -> State:
-        """Read simulation data from GULP output files and return coordinate, element, and velocity data.
+        """Read data from GULP output files and return coordinate, element, and velocity data.
 
         Arguments:
             filename (str): basename to use for reading output files

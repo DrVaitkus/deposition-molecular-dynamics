@@ -3,6 +3,7 @@
 Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
 License details given in distributed LICENSE file.
 """
+
 import logging
 import os
 import re
@@ -11,6 +12,7 @@ from enum import Enum
 from schema import And, Optional, Or, Schema, SchemaError, Use
 
 from deposition.distributions import PositionDistributionEnum, VelocityDistributionEnum
+from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum, SimulationCellEnum
 
 
@@ -58,12 +60,12 @@ def strictly_positive(number: int | float) -> int | float:
     return number
 
 
-def reserved_keyword(keyword) -> None:  #FIXME: Custom exception disguised as function
+def reserved_keyword(keyword) -> None:  # FIXME: Custom exception disguised as function
     """Allows keywords to be reserved by molecular dynamics drivers where required."""
     raise SchemaError("this key has been reserved for internal use")
 
 
-def check_input_file_syntax(driver):
+def check_input_file_syntax(driver: MolecularDynamicsDriver) -> None:
     """Validates the syntax of the input file template.
 
     Variables specified by `${var}` style notation are found and checked for mismatched
@@ -92,7 +94,8 @@ def check_input_file_syntax(driver):
     for key in reserved_keywords:
         if key not in template_keys:
             raise SchemaError(
-                f"key '{key} is used internally by {driver.name} and must be present in the template"
+                f"key '{key} is used internally by {driver.name} "
+                "and must be present in the template"
             )
 
     # check that the template keys are populated by the input settings

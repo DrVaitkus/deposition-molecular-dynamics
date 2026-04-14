@@ -23,7 +23,8 @@ def new_coordinates_and_velocities(
         settings (Settings): settings of the deposition calculation
         state: coordinates, elements, velocities
         simulation_cell (dict): size and shape of the simulation cell
-        velocity_scaling (float): value to rescale velocities from SI units to the units used by the MD software
+        velocity_scaling (float): value to rescale velocities from
+            SI units to the units used by the MD software
 
     Returns:
         state: coordinates, elements, velocities

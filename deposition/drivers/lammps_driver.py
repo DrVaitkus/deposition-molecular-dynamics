@@ -36,7 +36,8 @@ class LAMMPSDriver(MolecularDynamicsDriver):
 
     - atomic_masses (list): masses of elements in the potential in atomic mass units
     - elements_in_potential (str): space separated list of elements in the potential, e.g. "Al O H"
-    - timestep_scaling_from_picoseconds (int/float): required to calculate `num_steps` from the simulation times
+    - timestep_scaling_from_picoseconds (int | float): required to calculate
+        `num_steps` from the simulation times
 
     Note: the length and order of `atomic_masses` and `elements_in_potential` must match.
     """
@@ -53,7 +54,8 @@ class LAMMPSDriver(MolecularDynamicsDriver):
     command = "${prefix} ${binary} ${arguments} -in ${input_file} > ${output_file}"
     """Template used when calling LAMMPS subprocesses."""
 
-    def __init__(self, driver_settings: dict, simulation_cell: dict):
+    def __init__(self, driver_settings: dict, simulation_cell: dict) -> None:
+        """Initialise LAMMPS driver."""
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -70,7 +72,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
 
         Arguments:
             filename (str): name to use for input files
-            state: coordinates, elements, velocities
+            state (State): coordinates, elements, velocities
             iteration_stage (str): either "relaxation" or "deposition"
         """
         input_filename = f"{filename}.input"

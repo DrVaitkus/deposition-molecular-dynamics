@@ -34,8 +34,8 @@ class MolecularDynamicsDriver:
         command=None,
         schema_dict: dict | None = None,
         reserved_keywords=None,
-    ):
-
+    ) -> None:
+        """Initialise generic MD Driver."""
         if command is not None:
             self.command = command
         else:
@@ -61,6 +61,6 @@ class MolecularDynamicsDriver:
         self.simulation_cell = simulation_cell
         self.binary = self.settings["path_to_binary"]
 
-    def get_reserved_keywords(self):
+    def get_reserved_keywords(self) -> list:
         """Returns a list of global and driver specific reserved keywords."""
         return self._reserved_keywords

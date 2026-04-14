@@ -78,7 +78,7 @@ class ShiftToOrigin:
 
     default_parameters = True
 
-    def __init__(self, state, simulation_cell: dict, parameters) -> None:
+    def __init__(self, state: State, simulation_cell: dict, parameters) -> None:
         """Initialise the shift to origin class."""
         if parameters is None:
             parameters = self.default_parameters
