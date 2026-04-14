@@ -1,19 +1,26 @@
+"""Defines the functions for handling randomisation in simulations.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import logging
 
 import numpy as np
 
 from deposition import distributions, io, physics
 from deposition.input_schema import DepositionTypeEnum
+from deposition.settings import Settings
+from deposition.state import State
 
 
 def new_coordinates_and_velocities(
-    settings, state, simulation_cell: dict, velocity_scaling: float
-):
-    """Randomly generate new atoms based on the deposition settings and add them to the
-    existing structure.
+    settings: Settings, state: State, simulation_cell: dict, velocity_scaling: float
+) -> State:
+    """Randomly generate new atoms based on deposition settings and add them to the structure.
 
     Arguments:
-        settings: settings of the deposition calculation
+        settings (Settings): settings of the deposition calculation
         state: coordinates, elements, velocities
         simulation_cell (dict): size and shape of the simulation cell
         velocity_scaling (float): value to rescale velocities from SI units to the units used by the MD software
@@ -23,8 +30,8 @@ def new_coordinates_and_velocities(
     """
 
     def get_surface_height(
-        simulation_cell: dict, coordinates, percentage_of_box: int | float = 80
-    ):
+        simulation_cell: dict, coordinates: np.ndarray, percentage_of_box: int | float = 80
+    ) -> float:
         """Estimate surface height.
 
         This uses a crude method to find the surface of the existing structure by finding

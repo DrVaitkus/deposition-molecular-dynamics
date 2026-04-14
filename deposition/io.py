@@ -1,3 +1,9 @@
+"""Sub module for setting up reading / writing of files.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import collections
 import itertools
 import logging
@@ -43,15 +49,16 @@ def make_directories(directory_names: Iterable[path]) -> None:
     Arguments:
         directory_names (Iterable[path]): list of directory names to be created.
     """
-    for name in directory_names:
-        try:
+    try:
+        for name in directory_names:
             os.mkdir(name)
             logging.info(f"created directory '{name}'")
-        except FileExistsError:
-            logging.warning(f"directory '{name}' already exists, check for existing data")
-            raise FileExistsError(
-                f"remove the following directories to proceed: {[directory.value for directory in DirectoriesEnum]}"
-            )
+    except FileExistsError as file_exists:
+        logging.warning(f"directory '{name}' already exists, check for existing data")
+        raise FileExistsError(
+            "remove the following directories to proceed: "
+            f"{[directory.value for directory in DirectoriesEnum]}"
+        ) from file_exists
 
 
 def throw_away_lines(iterator, n: int) -> None:
@@ -112,8 +119,12 @@ def read_xyz(xyz_file: path, step: int | None = None) -> State:
     return State(np.array(coordinates), elements, velocities=None)
 
 
-def write_file_using_template(output_filename, template_filename, template_values):
-    """Uses the stdlib template module to perform find and replace in the provided
+def write_file_using_template(
+    output_filename: path, template_filename: path, template_values: dict
+) -> None:
+    """Writes the file using the stdlib template module.
+
+    Uses the stdlib template module to perform find and replace in the provided
     template and write a new file.
 
     Arguments:

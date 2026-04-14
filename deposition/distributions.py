@@ -41,8 +41,8 @@ class FixedPositionDistribution:
 class UniformPositionDistribution:
     """Returns a uniformly random position within the polygon."""
 
-    num_arguments = 0
-    _max_iterations = 10000
+    num_arguments: int = 0
+    _max_iterations: int = 10000
 
     def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None):
         """Initialise uniform position distribution."""

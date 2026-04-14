@@ -1,4 +1,4 @@
-"""Defines the Settings class to .
+"""Defines the Settings class that passes user settings to drivers.
 
 Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
 License details given in distributed LICENSE file.

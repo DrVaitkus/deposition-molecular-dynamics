@@ -1,3 +1,9 @@
+"""Defines the functions for post-processing simulations.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 from enum import Enum
 
 import numpy as np
@@ -6,12 +12,13 @@ from deposition.state import State
 from deposition.utils import generate_neighbour_list, get_simulation_cell, wrap_coordinates_in_z
 
 
-def run(name: str, state, simulation_cell: dict, parameters=None, dry_run=False):
+# FIXME: Positional bool with default
+def run(name: str, state: State, simulation_cell: dict, parameters=None, dry_run=False) -> None:
     """Runs the postprocessing check on the provided structural data.
 
     Args:
         name (str): the string referring to the check
-        state: coordinates, elements, velocities
+        state (State): coordinates, elements, velocities
         simulation_cell (dict): size and shape of the simulation cell
         parameters: any arguments required for the check
         dry_run: optionally skip the actual check (for validation at initialisation)
@@ -43,7 +50,7 @@ class NumNeighboursCheck:
     num_parameters = 2
     default_parameters = (1, 4.0)
 
-    def __init__(self, state, simulation_cell: dict, parameters):
+    def __init__(self, state: State, simulation_cell: dict, parameters) -> None:
         """Initialise the number of neighbours check."""
         if parameters is None:
             parameters = self.default_parameters

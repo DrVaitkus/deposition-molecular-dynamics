@@ -1,3 +1,8 @@
+"""Define the input schema for simulations.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
 import logging
 import os
 import re
@@ -20,40 +25,40 @@ def allowed_deposition_types(deposition_type):
     """Checks that the given deposition type is in the list of allowed types."""
     try:
         return DepositionTypeEnum[deposition_type.upper()].name
-    except KeyError:
+    except KeyError as bad_key:
         raise SchemaError(
             f"deposition type must be one of: {[x.name for x in DepositionTypeEnum]}"
-        )
+        ) from bad_key
 
 
 def allowed_position_distributions(selected_distribution):
     """Checks that the position distribution is in the list of allowed distributions."""
     try:
         return PositionDistributionEnum[selected_distribution].name
-    except KeyError:
+    except KeyError as bad_key:
         raise SchemaError(
             f"position distribution must be one of: {[x.name for x in PositionDistributionEnum]}"
-        )
+        ) from bad_key
 
 
 def allowed_velocity_distributions(selected_distribution):
     """Checks that the velocity distribution is in the list of allowed distributions."""
     try:
         return VelocityDistributionEnum[selected_distribution].name
-    except KeyError:
+    except KeyError as bad_key:
         raise SchemaError(
             f"velocity distribution must be one of: {[x.name for x in VelocityDistributionEnum]}"
-        )
+        ) from bad_key
 
 
-def strictly_positive(number):
+def strictly_positive(number: int | float) -> int | float:
     """Checks that the number is greater than zero."""
     if number <= 0:
         raise SchemaError("value must be greater than zero")
     return number
 
 
-def reserved_keyword(keyword):
+def reserved_keyword(keyword) -> None:  #FIXME: Custom exception disguised as function
     """Allows keywords to be reserved by molecular dynamics drivers where required."""
     raise SchemaError("this key has been reserved for internal use")
 
@@ -170,8 +175,8 @@ def get_settings_schema() -> Schema:
 def get_simulation_cell_schema() -> Schema:
     """Return the simulation cell schema.
 
-    Input schema for the parameters which define the periodic cell. Lengths are in
-    Angstroms and angles are in degrees.
+    Input schema for the parameters which define the periodic cell.
+    Lengths are in Angstroms and angles are in degrees.
 
     Example::
 
@@ -179,7 +184,7 @@ def get_simulation_cell_schema() -> Schema:
         b: 24     # Angstroms
         c: 200    # Angstroms
         alpha: 90 # degrees
-        beta: 90  # degrees
+        beta:  90 # degrees
         gamma: 90 # degrees
     """
     return simulation_cell_schema
