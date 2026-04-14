@@ -110,7 +110,7 @@ unfixable = []
 exclude = [
     ".git",
     "__pycache__",
-    "doc/conf.py",
+    "docs/conf.py",
     "old",
     "build",
     "dist",
