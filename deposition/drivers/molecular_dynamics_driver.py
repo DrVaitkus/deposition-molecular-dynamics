@@ -1,3 +1,8 @@
+"""Define the MD driver base class.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
 import os
 
 from schema import And, Optional, Or, Schema, Use

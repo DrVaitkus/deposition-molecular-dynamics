@@ -1,3 +1,9 @@
+"""Implement the LAMMPS MD software driver code.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import numpy as np
 import pandas as pd
 from pymatgen.io.lammps.data import LammpsData

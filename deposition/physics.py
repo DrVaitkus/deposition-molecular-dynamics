@@ -76,8 +76,9 @@ def velocity_from_normal_distribution(
         sigma = math.sqrt((CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass)
         return normal_distribution(mean, sigma)
     logging.warning(
-        "Particle mass in velocity calculation is zero, returning zero velocity. Note: this could be "
-        "due to a calculated zero for moment of inertia if you are depositing an on-axis molecule"
+        "Particle mass in velocity calculation is zero, returning zero "
+        "velocity. Note: this could be due to a calculated zero for "
+        "moment of inertia if you are depositing an on-axis molecule."
     )
     return 0
 

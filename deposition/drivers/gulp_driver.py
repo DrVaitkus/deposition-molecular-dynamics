@@ -1,3 +1,9 @@
+"""Implement the GULP MD software driver code.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import os
 
 import numpy as np
@@ -76,7 +82,7 @@ class GULPDriver(MolecularDynamicsDriver):
 
             Arguments:
                 filename (str): name to use for input files
-                coordinates (np.array): coordinate data
+                coordinates (np.ndarray): coordinate data
                 elements (list): atomic species data
             """
             with open(filename, "a") as file:
@@ -89,7 +95,7 @@ class GULPDriver(MolecularDynamicsDriver):
 
             Arguments:
                 filename (str): name to use for input files
-                velocities (np.array): velocity data
+                velocities (np.ndarray): velocity data
             """
             with open(filename, "a") as file:
                 file.write("velocities\n")
@@ -216,7 +222,7 @@ class GULPDriver(MolecularDynamicsDriver):
                 step_number (int or None): which step of the file to read from
 
             Returns:
-                data (np.array): data read from the file of the given type at the given step
+                data (np.ndarray): data read from the file of the given type at the given step
             """
             available_types = get_data_types(trajectory_file)
             if data_type not in available_types:

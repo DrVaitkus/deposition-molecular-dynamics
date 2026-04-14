@@ -86,9 +86,9 @@ parts of each iteration. Velocities can be ignored in the "relaxation" stage.
 The function must accept variables of the following types in this order:
 
 - filename (str): basename to use for input files
-- coordinates (np.array): coordinate data
+- coordinates (np.ndarray): coordinate data
 - elements (list): atomic species data
-- velocities (np.array): velocity data
+- velocities (np.ndarray): velocity data
 - iteration_stage (str): either "relaxation" or "deposition"
 
 A much simplified template is shown here::
@@ -107,9 +107,9 @@ A much simplified template is shown here::
 This function should be implemented as a static method. It must read data produced by the
 molecular dynamics software and return it as a tuple with the following order and formats:
 
-- coordinates (np.array): coordinate data
+- coordinates (np.ndarray): coordinate data
 - elements (list): atomic species data
-- velocities (np.array): velocity data
+- velocities (np.ndarray): velocity data
 
 A much simplified template is shown here::
 
