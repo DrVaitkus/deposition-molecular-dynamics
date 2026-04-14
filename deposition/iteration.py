@@ -77,7 +77,7 @@ class Iteration:
         self.call_process(self.deposition_filename)
         self.state = self.driver.read_outputs(self.deposition_filename)
 
-    def finalisation(self):
+    def finalisation(self) -> None:
         """Finalises the iteration by moving the data to the appropriate directory."""
         self.state.write(f"{self.deposition_filename}.pickle", include_velocities=False)
         if self.success:

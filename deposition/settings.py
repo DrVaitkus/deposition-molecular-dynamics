@@ -1,13 +1,25 @@
+"""Defines the Settings class to .
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+from typing import TypeVar
+
 import yaml
 
 from deposition import distributions, input_schema, postprocessing
 from deposition.enums import SettingsEnum
+from deposition.types import path
+
+# This can be replaced with "Self" when we update to 3.11.
+TSettings = TypeVar("TSettings", bound="Settings")
 
 
 class Settings:
     """Class to hold all settings for the deposition calculation."""
 
-    def __init__(self, settings):
+    def __init__(self, settings: dict) -> None:
+        """Initialises Settings class from setting dict."""
         self.command_prefix = settings[SettingsEnum.COMMAND_PREFIX.value]
         self.deposition_element = settings[SettingsEnum.DEPOSITION_ELEMENT.value]
         self.deposition_height = settings[SettingsEnum.DEPOSITION_HEIGHT.value]
@@ -36,13 +48,12 @@ class Settings:
         ]
         self.validate(settings)
 
-    def validate(self, settings):
+    def validate(self, settings: dict) -> None:
         """Performs additional validation not covered by the schema."""
         # check that required options for the deposition type are present
         for requirement in input_schema.DepositionTypeEnum[self.deposition_type].value:
-            assert requirement in settings.keys(), (
-                f"{requirement} required in {self.deposition_type} deposition"
-            )
+            if requirement not in settings.keys():
+                raise KeyError(f"{requirement} required in {self.deposition_type} deposition")
 
         # check that the position distribution has valid parameters
         distributions.get_position_distribution(
@@ -60,8 +71,8 @@ class Settings:
             for name, parameters in self.postprocessing.items():
                 postprocessing.run(name, None, None, parameters, dry_run=True)
 
-    @staticmethod
-    def from_file(filename):
+    @classmethod
+    def from_file(cls, filename: path) -> TSettings:
         """Read and validate a YAML file containing simulation settings.
 
         Arguments:
@@ -73,11 +84,11 @@ class Settings:
         with open(filename) as file:
             settings_dict = yaml.safe_load(file)
         settings_dict = input_schema.get_settings_schema().validate(settings_dict)
-        settings = Settings(settings_dict)
+        settings = cls(settings_dict)
         settings.validate(settings_dict)
         return settings
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """Returns the settings as a dictionary."""
         return {
             key: value

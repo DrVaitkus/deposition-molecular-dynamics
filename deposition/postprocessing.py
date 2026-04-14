@@ -6,13 +6,13 @@ from deposition.state import State
 from deposition.utils import generate_neighbour_list, get_simulation_cell, wrap_coordinates_in_z
 
 
-def run(name, state, simulation_cell, parameters=None, dry_run=False):
+def run(name: str, state, simulation_cell: dict, parameters=None, dry_run=False):
     """Runs the postprocessing check on the provided structural data.
 
     Args:
-        name: the string referring to the check
+        name (str): the string referring to the check
         state: coordinates, elements, velocities
-        simulation_cell: size and shape of the simulation cell
+        simulation_cell (dict): size and shape of the simulation cell
         parameters: any arguments required for the check
         dry_run: optionally skip the actual check (for validation at initialisation)
     """
@@ -43,18 +43,21 @@ class NumNeighboursCheck:
     num_parameters = 2
     default_parameters = (1, 4.0)
 
-    def __init__(self, state, simulation_cell, parameters):
+    def __init__(self, state, simulation_cell: dict, parameters):
+        """Initialise the number of neighbours check."""
         if parameters is None:
             parameters = self.default_parameters
-        assert len(parameters) == self.num_parameters, (
-            f"{self.__class__} requires {self.num_parameters} argument(s)"
-        )
+
+        if len(parameters) != self.num_parameters:
+            raise ValueError(f"{self.__class__} requires {self.num_parameters} argument(s)")
+
         self.min_neighbours = float(parameters[0])
         self.bonding_cutoff = float(parameters[1])
         self.state = state
         self.simulation_cell = simulation_cell
 
     def run(self) -> State:
+        """Check the number of neighbours."""
         neighbour_list = generate_neighbour_list(
             self.simulation_cell, self.state.coordinates, self.bonding_cutoff
         )
@@ -68,7 +71,8 @@ class ShiftToOrigin:
 
     default_parameters = True
 
-    def __init__(self, state, simulation_cell, parameters):
+    def __init__(self, state, simulation_cell: dict, parameters) -> None:
+        """Initialise the shift to origin class."""
         if parameters is None:
             parameters = self.default_parameters
         if not isinstance(parameters, bool):

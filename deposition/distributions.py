@@ -21,12 +21,13 @@ class FixedPositionDistribution:
     num_arguments = 2
     default_arguments = (0.0, 0.0)
 
-    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments) -> None:
+        """Initialise fixed position distribution."""
         if arguments is None:
             arguments = self.default_arguments
-        assert len(arguments) == self.num_arguments, (
-            f"{self.__class__} requires {self.num_arguments} argument(s)"
-        )
+
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.polygon_coordinates = polygon_coordinates
         self.z = z
         self.x = float(arguments[0])
@@ -44,10 +45,12 @@ class UniformPositionDistribution:
     _max_iterations = 10000
 
     def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None):
+        """Initialise uniform position distribution."""
         self.polygon_coordinates = polygon_coordinates
         self.z = z
 
-    def get_position(self):
+    def get_position(self) -> tuple[float, float, float]:
+        """Return a position from the distribution."""
         polygon = mplpath.Path(self.polygon_coordinates)
         bbox = polygon.get_extents()
         for _ in range(self._max_iterations):
@@ -70,11 +73,11 @@ class FixedVelocityDistribution:
     default_arguments = (0.0, 0.0, -100.0)
 
     def __init__(self, arguments):
+        """Initialise fixed velocity distribution."""
         if arguments is None:
             arguments = self.default_arguments
-        assert len(arguments) == self.num_arguments, (
-            f"{self.__class__} requires {self.num_arguments} argument(s)"
-        )
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.vx = float(arguments[0])
         self.vy = float(arguments[1])
         self.vz = float(arguments[2])
@@ -96,9 +99,8 @@ class GaussianVelocityDistribution:
     def __init__(self, arguments):
         if arguments is None:
             arguments = self.default_arguments
-        assert len(arguments) == self.num_arguments, (
-            f"{self.__class__} requires {self.num_arguments} argument(s)"
-        )
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.gas_temperature = float(arguments[0])
         self.particle_mass = float(arguments[1])
         self.mean = arguments = float(arguments[2])
