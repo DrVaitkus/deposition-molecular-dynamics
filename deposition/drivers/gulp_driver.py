@@ -11,14 +11,16 @@ import numpy as np
 from deposition import io, physics
 from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
+from deposition.path import path
 from deposition.state import State
 
 
 class GULPDriver(MolecularDynamicsDriver):
     """Class to interface between deposition package and GULP software.
 
-    GULPDriver defines input variables required for the driver functions to work, as well as how to call GULP on the
-    _command line, write GULP input files, and read GULP output files. The `schema_dict` defines additional
+    GULPDriver defines input variables required for the driver functions to
+    work, as well as how to call GULP on the _command line, write GULP input
+    files, and read GULP output files. The `schema_dict` defines additional
     inputs which are required when using the GULP driver.
     """
 
@@ -62,13 +64,15 @@ class GULPDriver(MolecularDynamicsDriver):
         )
         self.set_environment_variables()
 
-    def set_environment_variables(self):
-        """Uses the user provided value for GULP_LIB to set the environment variable. This is essential to use the
-        potentials which ship with GULP.
+    def set_environment_variables(self) -> None:
+        """Set the environment variable for the GULP library.
+
+        Uses the user provided value for GULP_LIB to set the environment
+        variable. This is essential to use the potentials which ship with GULP.
         """
         os.putenv("GULP_LIB", self.settings["GULP_LIB"])
 
-    def write_inputs(self, filename, state, iteration_stage):
+    def write_inputs(self, filename: str, state: State, iteration_stage: str) -> None:
         """Write GULP input file for the next part of the deposition calculation.
 
         Arguments:
@@ -77,7 +81,7 @@ class GULPDriver(MolecularDynamicsDriver):
             iteration_stage (str): either "relaxation" or "deposition"
         """
 
-        def write_positions(filename, coordinates, elements):
+        def write_positions(filename: str, coordinates: np.ndarray, elements: list) -> None:
             """Write positional data to the GULP input file.
 
             Arguments:
@@ -90,7 +94,7 @@ class GULPDriver(MolecularDynamicsDriver):
                 for atom, xyz in zip(elements, coordinates, strict=True):
                     file.write(f"{atom} {xyz[0]} {xyz[1]}, {xyz[2]}\n")
 
-        def write_velocities(filename, velocities):
+        def write_velocities(filename: str, velocities: np.ndarray) -> None:
             """Write positional data to the GULP input file.
 
             Arguments:
@@ -102,7 +106,9 @@ class GULPDriver(MolecularDynamicsDriver):
                 for ii, v in enumerate(velocities):
                     file.write(f"{ii} {v[0]} {v[1]} {v[2]}\n")
 
-        def parameters_from_simulation_cell(simulation_cell):
+        def parameters_from_simulation_cell(
+            simulation_cell: dict,
+        ) -> tuple[float, float, float, float, float, float]:
             """Get a GULP friendly specification of the simulation cell from the dict.
 
             Arguments:
@@ -162,19 +168,23 @@ class GULPDriver(MolecularDynamicsDriver):
             write_velocities(input_filename, state.velocities)
 
     @staticmethod
-    def get_thermostat_damping(num_atoms, temperature=300.0):
-        """Calculate the required Nose-Hoover coupling constant which should give rise to canonical
-        temperature fluctuations throughout the simulation. The values used are derived from a fitted power
-        law equation. See Section 2.4.1 in my `thesis`_.
+    def get_thermostat_damping(num_atoms: int, temperature: float = 300.0) -> float:
+        """Calculate NH coupling to give rise to canonical temperature fluctuations.
+
+        This method calculates the required Nose-Hoover coupling constant which should
+        give rise to canonical temperature fluctuations throughout the simulation.
+        The values used are derived from a fitted power law equation.
+        See Section 2.4.1 of Martin J. Cyster's `thesis`_.
 
         Arguments:
             num_atoms (int): the number of atoms in the simulation
             temperature (float): temperature of the simulation in Kelvin
 
         Returns:
-            nose_hoover (float): the coupling constant required to give the canonical variance in the simulation
+            nose_hoover (float): the coupling constant required
+                to give the canonical variance in the simulation.
 
-        .. _thesis: https://researchrepository.rmit.edu.au/discovery/delivery/61RMIT_INST:RMITU/12247670720001341
+        .. _thesis: https://doi.org/10.25439/rmt.27580476
         """
         minimum_nose_hoover_parameter = 0.0001
         a = 610.0
@@ -184,7 +194,7 @@ class GULPDriver(MolecularDynamicsDriver):
         return max(round(nose_hoover, 6), minimum_nose_hoover_parameter)
 
     @staticmethod
-    def read_outputs(filename):
+    def read_outputs(filename: str):
         """Read simulation data from GULP output files and return coordinate, element, and velocity data.
 
         Arguments:
@@ -194,7 +204,7 @@ class GULPDriver(MolecularDynamicsDriver):
             state: coordinates, elements, velocities
         """
 
-        def get_data_types(trajectory_file):
+        def get_data_types(trajectory_file: path):
             """Assess the type of data contained in the trajectory file.
 
             Arguments:
