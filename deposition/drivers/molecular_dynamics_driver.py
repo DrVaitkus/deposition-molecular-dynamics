@@ -29,10 +29,10 @@ class MolecularDynamicsDriver:
 
     def __init__(
         self,
-        driver_settings,
-        simulation_cell,
+        driver_settings: dict,
+        simulation_cell: dict,
         command=None,
-        schema_dict=None,
+        schema_dict: dict | None = None,
         reserved_keywords=None,
     ):
 

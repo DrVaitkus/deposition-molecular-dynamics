@@ -55,7 +55,7 @@ class GULPDriver(MolecularDynamicsDriver):
     - gamma (float): used in template to specify simulation cell
     """
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict):
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -194,26 +194,28 @@ class GULPDriver(MolecularDynamicsDriver):
         return max(round(nose_hoover, 6), minimum_nose_hoover_parameter)
 
     @staticmethod
-    def read_outputs(filename: str):
+    def read_outputs(filename: str) -> State:
         """Read simulation data from GULP output files and return coordinate, element, and velocity data.
 
         Arguments:
             filename (str): basename to use for reading output files
 
         Returns:
-            state: coordinates, elements, velocities
+            State: coordinates, elements, velocities
         """
 
-        def get_data_types(trajectory_file: path):
+        def get_data_types(trajectory_file: path) -> list:
             """Assess the type of data contained in the trajectory file.
 
             Arguments:
-                trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
+                trajectory_file (path): GULP trajectory (.trj) file
+                    containing position, velocity, and other data.
 
             Returns:
-                list_of_data_types (list): types of data in the file, e.g. Coordinates, Velocities, Charges, etc.
+                list_of_data_types (list): types of data in the file,
+                    e.g. Coordinates, Velocities, Charges, etc.
             """
-            list_of_data_types = list()
+            list_of_data_types = []
             with open(trajectory_file) as file:
                 for line in file:
                     if line.startswith("#") and "Time" not in line:
@@ -223,11 +225,14 @@ class GULPDriver(MolecularDynamicsDriver):
                         list_of_data_types.append(data_type)
             return list_of_data_types
 
-        def get_data_from_trajectory_file(trajectory_file, data_type, step_number=None):
+        def get_data_from_trajectory_file(
+            trajectory_file: path, data_type: str, step_number: int | None = None
+        ) -> np.ndarray:
             """Read data from the trajectory file.
 
             Arguments:
-                trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
+                trajectory_file (path): GULP trajectory (.trj) file
+                    containing position, velocity, and other data.
                 data_type (str): type of data to read, e.g. Coordinates, Velocities, Charges, etc.
                 step_number (int or None): which step of the file to read from
 

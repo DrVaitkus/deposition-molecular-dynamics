@@ -16,7 +16,7 @@ from deposition.enums import SettingsEnum
 class TemplateDriver(MolecularDynamicsDriver):
     """Template to help with writing new MolecularDynamicsDriver classes."""
 
-    schema_dict = {
+    schema_dict: dict = {
         "atomic_masses": list,
         "path_to_potential": os.path.exists,
         "thermostat_parameter": Or(float, int),
@@ -28,7 +28,7 @@ class TemplateDriver(MolecularDynamicsDriver):
 
     command = "${prefix} ${binary} ${arguments} < ${input_file} > ${output_file}"
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict):
         super().__init__(
             driver_settings,
             simulation_cell,

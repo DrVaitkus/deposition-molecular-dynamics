@@ -53,7 +53,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
     command = "${prefix} ${binary} ${arguments} -in ${input_file} > ${output_file}"
     """Template used when calling LAMMPS subprocesses."""
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict):
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -62,8 +62,11 @@ class LAMMPSDriver(MolecularDynamicsDriver):
             reserved_keywords=self.reserved_keywords,
         )
 
-    def write_inputs(self, filename, state, iteration_stage):
-        """Write LAMMPS input file and input system data to run the next part of the deposition calculation.
+    def write_inputs(self, filename: str, state: State, iteration_stage: str) -> None:
+        """Write LAMMPS input file.
+
+        Write LAMMPS input file and input system data to
+        run the next part of the deposition calculation.
 
         Arguments:
             filename (str): name to use for input files
@@ -133,7 +136,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         lammps_data_object.write_file(input_data_filename)
 
     @staticmethod
-    def read_outputs(filename):
+    def read_outputs(filename: str) -> State:
         """Read data from LAMMPS output files and return coordinate, element, and velocity data.
 
         Arguments:
