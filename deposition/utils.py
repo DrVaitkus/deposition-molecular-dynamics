@@ -128,16 +128,14 @@ def generate_neighbour_list(
     return [len(atom_neighbours) for atom_neighbours in neighbours]  # neighbour_list
 
 
-def wrap_coordinates_in_z(
+def unwrap_z_coordinates(
     simulation_cell: dict, coordinates: np.ndarray, percentage_of_box: float = 80.0
 ) -> np.ndarray:
-    """Wraps atoms that have been moved to the top of the box back around.
+    """Unwraps atoms that have been moved to the top of the box back around.
 
     Take cartesian state and wrap those at the top of the box back
     into the main structure at the bottom of the box. This will
     set negative z_plane-state for those atoms which are wrapped.
-
-    FIXME: Technically this is an unwrap.
 
     Arguments:
         simulation_cell (dict): size and shape of the simulation cell
@@ -150,7 +148,7 @@ def wrap_coordinates_in_z(
     """
     lz = simulation_cell["z_max"] - simulation_cell["z_min"]
     cutoff = lz * (percentage_of_box / 100)
-    return [
+    return np.array([
         coordinates[ii] - simulation_cell["z_vector"] if z > cutoff else coordinates[ii]
         for ii, (x, y, z) in enumerate(coordinates)
-    ]
+    ], dtype=float)

@@ -11,8 +11,8 @@ import numpy as np
 from deposition import io, physics
 from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
-from deposition.path import path
 from deposition.state import State
+from deposition.types import path
 
 
 class GULPDriver(MolecularDynamicsDriver):

@@ -9,7 +9,7 @@ from enum import Enum
 import numpy as np
 
 from deposition.state import State
-from deposition.utils import generate_neighbour_list, get_simulation_cell, wrap_coordinates_in_z
+from deposition.utils import generate_neighbour_list, get_simulation_cell, unwrap_z_coordinates
 
 
 # FIXME: Positional bool with default
@@ -73,27 +73,35 @@ class NumNeighboursCheck:
         return self.state
 
 
+
 class ShiftToOrigin:
     """Relocates the entire atomic structure to the origin (0,0,0) at the end of each iteration."""
 
-    default_parameters = True
+    default_parameters = False
 
-    def __init__(self, state: State, simulation_cell: dict, parameters) -> None:
+    #FIXME: The input parameter is unused, this just automatically applies the default.
+    def __init__(self, state: State, simulation_cell: dict, *args: bool) -> None:
         """Initialise the shift to origin class."""
-        if parameters is None:
-            parameters = self.default_parameters
-        if not isinstance(parameters, bool):
+        if args is None:
+            args = self.default_parameters
+        if not isinstance(args[0], bool):
             raise TypeError("shift to origin routine must be True or False")
         self.state = state
         self.simulation_cell = simulation_cell
+        self.perform_shift = args[0]
 
     def run(self) -> State:
-        """Moves the given state back to the origin at (0, 0, 0)."""
+        """Moves the bottom of the atoms back to z=0 and leaves remaining atoms unchanged."""
         full_simulation_cell = get_simulation_cell(self.simulation_cell)
-        wrapped = wrap_coordinates_in_z(full_simulation_cell, self.state.coordinates)
-        minima = np.min(wrapped, axis=0)
-        shifted_coordinates = np.subtract(wrapped, minima)
-        return State(shifted_coordinates, self.state.elements, self.state.velocities)
+
+        if self.perform_shift:
+            new_coordinates = unwrap_z_coordinates(full_simulation_cell, self.state.coordinates)
+            minimum_z = np.min(new_coordinates[:, 2])
+            new_coordinates[:,2] -= minimum_z
+        else:
+            new_coordinates = self.state.coordinates.__copy__()
+
+        return State(new_coordinates, self.state.elements, self.state.velocities)
 
 
 class PostProcessingEnum(Enum):

@@ -8,12 +8,15 @@ import logging
 import os
 import re
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from schema import And, Optional, Or, Schema, SchemaError, Use
 
 from deposition.distributions import PositionDistributionEnum, VelocityDistributionEnum
-from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum, SimulationCellEnum
+
+if TYPE_CHECKING:
+    from deposition.drivers import MolecularDynamicsDriver
 
 
 class DepositionTypeEnum(Enum):
@@ -65,7 +68,7 @@ def reserved_keyword(keyword) -> None:  # FIXME: Custom exception disguised as f
     raise SchemaError("this key has been reserved for internal use")
 
 
-def check_input_file_syntax(driver: MolecularDynamicsDriver) -> None:
+def check_input_file_syntax(driver: "MolecularDynamicsDriver") -> None:
     """Validates the syntax of the input file template.
 
     Variables specified by `${var}` style notation are found and checked for mismatched
