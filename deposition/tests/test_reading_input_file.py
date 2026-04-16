@@ -8,8 +8,8 @@ import deposition.input_schema
 import deposition.settings
 
 """
-Note: validation of data types is performed by the schema package, subject to 
-deposition/schema_definitions.py.
+NOTE: validation of data types is performed by the schema package,
+subject to deposition/schema_definitions.py.
 """
 
 SETTINGS_FILE = os.path.join(os.path.dirname(__file__), "test_data/valid_settings.yaml")

@@ -14,10 +14,10 @@ maximum_total_iterations: 10
 
 driver_settings:
     name: GULP
-    path_to_binary: /Users/martin/work/repos/gulp-5.0/Src/gulp
+    path_to_binary: /your-path-here/gulp-5.0/Src/gulp
     path_to_input_template: settings/gulp_input_template.txt
     velocity_scaling_from_metres_per_second: 0.01  # convert to Angstroms/ps
-    GULP_LIB: /Users/martin/work/repos/gulp-5.0/Libraries/ # /home/595/mjc595/gulp-5.0/Libraries/
+    GULP_LIB: /your-path-here/gulp-5.0/Libraries/
     # extra values to replace in input template
     library_name: streitzmintmire
     temperature_of_system: 300

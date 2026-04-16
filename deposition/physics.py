@@ -1,3 +1,9 @@
+"""Routines for calculating physical quantities.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import logging
 import math
 
@@ -13,17 +19,19 @@ Define physical constants of the universe used by other functions.
 """
 
 
-def get_canonical_variance(num_atoms, temperature=300.0):
-    """
-    The dependence of the temperature variance in the Nose-Hoover thermostat on the number of atoms and the temperature
-    of the system has been studied by `Holian et al.`_ This function implements Equation 6 from this paper
+def get_canonical_variance(num_atoms: int, temperature: float = 300.0) -> float:
+    r"""Get the canoncial variance of a Nose-Hoover thermostat.
+
+    The dependence of the temperature variance in the Nose-Hoover thermostat on
+    the number of atoms and the temperature of the system has been studied by
+    `Holian et al.`_ This function implements Equation 6 from this paper
 
     .. math::
 
        \\sigma^2(d, T, N) = \\frac{2}{d} \\frac{T^2}{N}
 
-    where :math:`\\sigma^2` is the variance, `d` is the number of dimensions, `T` is the temperature, and `N` is the
-    number of atoms.
+    where :math:`\\sigma^2` is the variance, `d` is the number of
+    dimensions, `T` is the temperature, and `N` is the number of atoms.
 
     Arguments:
         num_atoms (int): the number of atoms in the simulation
@@ -34,14 +42,12 @@ def get_canonical_variance(num_atoms, temperature=300.0):
 
     .. _Holian et al.: https://www.doi.org/10.1103/PhysRevE.52.2338
     """
-    num_dimensions = 3.0
-    canonical_variance = (2 * pow(temperature, 2)) / (num_dimensions * num_atoms)
-    return canonical_variance
+    num_dimensions: int = 3
+    return (2 * pow(temperature, 2)) / (num_dimensions * num_atoms)
 
 
-def normal_distribution(mean, sigma):
-    """
-    Uses the `numpy.random.normal` function to generate random values from a normal distribution.
+def normal_distribution(mean: float, sigma: float) -> float:
+    """Uses the `numpy.random.normal` to generate random values from a normal distribution.
 
     Arguments:
         mean (float): the centre of the normal distribution
@@ -53,9 +59,10 @@ def normal_distribution(mean, sigma):
     return np.random.normal(loc=mean, scale=sigma)
 
 
-def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
-    """
-    Return a velocity in metres per second randomly selected from a normal distribution.
+def velocity_from_normal_distribution(
+    gas_temperature: float, particle_mass: float, mean: float = 0.0
+) -> float:
+    """Return a velocity in metres per second randomly selected from a normal distribution.
 
     Arguments:
         gas_temperature (float): temperature of the ideal gas in Kelvin
@@ -66,45 +73,39 @@ def velocity_from_normal_distribution(gas_temperature, particle_mass, mean=0.0):
         random velocity in metres per second (float)
     """
     if particle_mass > 0:
-        sigma = math.sqrt(
-            (CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass
-        )
+        sigma = math.sqrt((CONSTANTS["BoltzmannConstant"] * gas_temperature) / particle_mass)
         return normal_distribution(mean, sigma)
-    else:
-        logging.warning(
-            "Particle mass in velocity calculation is zero, returning zero velocity. Note: this could be "
-            "due to a calculated zero for moment of inertia if you are depositing an on-axis molecule"
-        )
-        return 0
+    logging.warning(
+        "Particle mass in velocity calculation is zero, returning zero "
+        "velocity. Note: this could be due to a calculated zero for "
+        "moment of inertia if you are depositing an on-axis molecule."
+    )
+    return 0
 
 
-def get_centre_of_mass(coordinates, elements):
-    """
-    Calculates the centre of mass
+def get_centre_of_mass(coordinates: np.ndarray, elements: list) -> tuple[np.array, list]:
+    """Calculates the centre of mass.
 
     Arguments:
-        coordinates (array): state of the atoms
+        coordinates (np.ndarray): state of the atoms
         elements (list): list of str with element names
 
     Returns:
-        centre_of_mass, masses (tuple)
+        centre_of_mass, masses (tuple)>
             - centre_of_mass (array): xyz coordinate of the centre of mass
             - masses (list): list of the atomic masses in kg
     """
     atoms = [Element(e) for e in elements]
-    masses = [
-        CONSTANTS["AtomicMassUnit_kg"] * float(atom.atomic_mass) for atom in atoms
-    ]
+    masses = [CONSTANTS["AtomicMassUnit_kg"] * float(atom.atomic_mass) for atom in atoms]
     centre_of_mass_list = [
-        mass * coordinate for mass, coordinate in zip(masses, coordinates)
+        mass * coordinate for mass, coordinate in zip(masses, coordinates, strict=True)
     ]
     centre_of_mass = np.sum(centre_of_mass_list, axis=0) / np.sum(masses)
     return centre_of_mass, masses
 
 
-def get_moment_of_inertia(coordinates, elements):
-    """
-    Calculates the moment of inertia
+def get_moment_of_inertia(coordinates: np.ndarray, elements: list) -> np.ndarray:
+    """Calculates the moment of inertia.
 
     Arguments:
         coordinates (array): state of the atoms
@@ -117,7 +118,6 @@ def get_moment_of_inertia(coordinates, elements):
     centre_of_mass, masses = get_centre_of_mass(coordinates, elements)
     distances = [np.subtract(coordinate, centre_of_mass) for coordinate in coordinates]
     mass_distance_product = np.atleast_2d(
-        [mass * np.abs(distance) for mass, distance in zip(masses, distances)]
+        [mass * np.abs(distance) for mass, distance in zip(masses, distances, strict=True)]
     )
-    moment_of_inertia = np.sum(mass_distance_product, axis=0)
-    return moment_of_inertia
+    return np.sum(mass_distance_product, axis=0)  # moment_of_inertia

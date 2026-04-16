@@ -1,3 +1,9 @@
+"""Defines distribution classes and functions for position and velocity.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import math
 from enum import Enum
 
@@ -6,83 +12,48 @@ from matplotlib import path as mplpath
 
 from deposition import physics
 
-
-def get_position_distribution(name, polygon_coordinates, z_plane, arguments=None):
-    """
-    Returns a position distribution object
-
-    Arguments:
-        name (str): string used to choose a particular distribution
-        arguments (list): arguments to pass to constructor
-        polygon_coordinates (np.array): xy-coordinates of the polygon within which to generate a position
-        z_plane (float): z-coordinate of the position
-
-    Returns:
-        Position distribution object
-    """
-    try:
-        position_class = PositionDistributionEnum[name].value
-        return position_class(polygon_coordinates, z_plane, arguments)
-    except KeyError:
-        raise ValueError(f"unknown position distribution: {name}")
-
-
-def get_velocity_distribution(name, arguments=None):
-    """
-    Returns a velocity distribution object
-
-    Arguments:
-        name (str): string used to choose a particular distribution
-        arguments (list): arguments to pass to constructor
-
-    Returns:
-        Velocity distribution object
-    """
-    try:
-        velocity_class = VelocityDistributionEnum[name].value
-        return velocity_class(arguments)
-    except KeyError:
-        raise ValueError(f"unknown velocity distribution: {name}")
-
-
 """Position distribution classes"""
 
 
 class FixedPositionDistribution:
-    """Returns the specified position"""
+    """Returns the specified position."""
 
     num_arguments = 2
     default_arguments = (0.0, 0.0)
 
-    def __init__(self, polygon_coordinates, z, arguments):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments) -> None:
+        """Initialise fixed position distribution."""
         if arguments is None:
             arguments = self.default_arguments
-        assert (
-            len(arguments) == self.num_arguments
-        ), f"{self.__class__} requires {self.num_arguments} argument(s)"
+
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.polygon_coordinates = polygon_coordinates
         self.z = z
         self.x = float(arguments[0])
         self.y = float(arguments[1])
 
-    def get_position(self):
+    def get_position(self) -> tuple[float, float, float]:
+        """Returns the position from the fixed distribution."""
         return self.x, self.y, self.z
 
 
 class UniformPositionDistribution:
-    """Returns a uniformly random position within the polygon"""
+    """Returns a uniformly random position within the polygon."""
 
-    num_arguments = 0
-    _max_iterations = 10000
+    num_arguments: int = 0
+    _max_iterations: int = 10000
 
-    def __init__(self, polygon_coordinates, z, arguments=None):
+    def __init__(self, polygon_coordinates: np.ndarray, z: float, arguments=None) -> None:
+        """Initialise uniform position distribution."""
         self.polygon_coordinates = polygon_coordinates
         self.z = z
 
-    def get_position(self):
+    def get_position(self) -> tuple[float, float, float]:
+        """Return a position from the distribution."""
         polygon = mplpath.Path(self.polygon_coordinates)
         bbox = polygon.get_extents()
-        for iteration in range(self._max_iterations):
+        for _ in range(self._max_iterations):
             point = (
                 np.random.uniform(bbox.xmin, bbox.xmax),
                 np.random.uniform(bbox.ymin, bbox.ymax),
@@ -96,52 +67,54 @@ class UniformPositionDistribution:
 
 
 class FixedVelocityDistribution:
-    """Returns the specified velocity"""
+    """Returns the specified velocity."""
 
     num_arguments = 3
     default_arguments = (0.0, 0.0, -100.0)
 
-    def __init__(self, arguments):
+    def __init__(self, arguments) -> None:
+        """Initialise fixed velocity distribution."""
         if arguments is None:
             arguments = self.default_arguments
-        assert (
-            len(arguments) == self.num_arguments
-        ), f"{self.__class__} requires {self.num_arguments} argument(s)"
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.vx = float(arguments[0])
         self.vy = float(arguments[1])
         self.vz = float(arguments[2])
 
-    def get_velocity(self):
+    def get_velocity(self) -> tuple[float, float, float]:
+        """Returns the velocity components."""
         return self.vx, self.vy, self.vz
 
 
 class GaussianVelocityDistribution:
-    """
-    Returns a velocity in metres per second randomly selected from a normal distribution.
+    """Returns a velocity in metres per second randomly selected from a normal distribution.
+
     Uses the gas_temperature (Kelvin), particle_mass (kg), and mean value (m/s).
     """
 
     num_arguments = 3
     default_arguments = (300.0, 1e-25, 0.0)
 
-    def __init__(self, arguments):
+    def __init__(self, arguments) -> None:
+        """Initialise the Gaussian velocity distribution class."""
         if arguments is None:
             arguments = self.default_arguments
-        assert (
-            len(arguments) == self.num_arguments
-        ), f"{self.__class__} requires {self.num_arguments} argument(s)"
+        if len(arguments) != self.num_arguments:
+            raise ValueError(f"{self.__class__} requires {self.num_arguments} argument(s)")
         self.gas_temperature = float(arguments[0])
         self.particle_mass = float(arguments[1])
         self.mean = arguments = float(arguments[2])
 
-    def get_single_velocity(self):
+    def get_single_velocity(self) -> float:
+        """Returns a single velocity from the distribution."""
         sigma = math.sqrt(
-            (physics.CONSTANTS["BoltzmannConstant"] * self.gas_temperature)
-            / self.particle_mass
+            (physics.CONSTANTS["BoltzmannConstant"] * self.gas_temperature) / self.particle_mass
         )
         return np.random.normal(loc=self.mean, scale=sigma)
 
-    def get_velocity(self):
+    def get_velocity(self) -> tuple[float, float, float]:
+        """Returns the velocity components."""
         vx = self.get_single_velocity()
         vy = self.get_single_velocity()
         vz = self.get_single_velocity()
@@ -152,14 +125,54 @@ class GaussianVelocityDistribution:
 
 
 class PositionDistributionEnum(Enum):
-    """List of available position distribution classes"""
+    """List of available position distribution classes."""
 
     fixed = FixedPositionDistribution
     uniform = UniformPositionDistribution
 
 
 class VelocityDistributionEnum(Enum):
-    """List of available velocity distribution classes"""
+    """List of available velocity distribution classes."""
 
     fixed = FixedVelocityDistribution
     gaussian = GaussianVelocityDistribution
+
+
+def get_position_distribution(
+    name: str, polygon_coordinates: np.ndarray, z_plane: float, arguments: list | None = None
+) -> PositionDistributionEnum:
+    """Returns a position distribution object.
+
+    Arguments:
+        name (str): string used to choose a particular distribution
+        polygon_coordinates (np.ndarray): x,y-coordinates of polygon to generate positions in
+        z_plane (float): z-coordinate of the position
+        arguments (list): arguments to pass to constructor
+
+    Returns:
+        Position distribution object
+    """
+    try:
+        position_class = PositionDistributionEnum[name].value
+        return position_class(polygon_coordinates, z_plane, arguments)
+    except KeyError as bad_key:
+        raise ValueError(f"unknown position distribution: {name}") from bad_key
+
+
+def get_velocity_distribution(
+    name: str, arguments: list | None = None
+) -> VelocityDistributionEnum:
+    """Returns a velocity distribution object.
+
+    Arguments:
+        name (str): string used to choose a particular distribution
+        arguments (list): arguments to pass to constructor
+
+    Returns:
+        Velocity distribution object
+    """
+    try:
+        velocity_class = VelocityDistributionEnum[name].value
+        return velocity_class(arguments)
+    except KeyError as bad_key:
+        raise ValueError(f"unknown velocity distribution: {name}") from bad_key

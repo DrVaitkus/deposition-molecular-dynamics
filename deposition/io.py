@@ -1,19 +1,26 @@
+"""Sub module for setting up reading / writing of files.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import collections
 import itertools
 import logging
 import os
 import sys
+from collections.abc import Iterable
 from string import Template
 
 import numpy as np
 
 from deposition.enums import DirectoriesEnum
 from deposition.state import State
+from deposition.types import path
 
 
-def start_logging(log_filename):
-    """
-    Starts logging to both stdout and given filename
+def start_logging(log_filename: path) -> None:
+    """Starts logging to both stdout and given filename.
 
     Arguments:
         log_filename (path): where to write the log file
@@ -23,8 +30,7 @@ def start_logging(log_filename):
     log_to_file = logging.FileHandler(log_filename)
     log_to_stdout = logging.StreamHandler(sys.stdout)
     formatter = logging.Formatter(
-        "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] "
-        "%(message)s",
+        "[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s",
         datefmt="%a %d %b %Y %H:%M:%S",
     )
     log_to_file.setFormatter(formatter)
@@ -34,30 +40,31 @@ def start_logging(log_filename):
     logging.info(f"logging to {log_filename} and stdout")
 
 
-def make_directories(directory_names):
-    """
-    Creates directories from a list of names and logs warning instead of error when
-    directories already exist.
+def make_directories(directory_names: Iterable[path]) -> None:
+    """Make the directories given an iterable of names.
+
+    Creates directories from a list of names and logs warnings
+    instead of returning an error when directories already exist.
 
     Arguments:
-        directory_names (tuple): list of directory names to be created
+        directory_names (Iterable[path]): list of directory names to be created.
     """
-    for name in directory_names:
-        try:
+    try:
+        for name in directory_names:
             os.mkdir(name)
             logging.info(f"created directory '{name}'")
-        except FileExistsError as error:
-            logging.warning(
-                f"directory '{name}' already exists, check for existing data"
-            )
-            raise FileExistsError(
-                f"remove the following directories to proceed: {[directory.value for directory in DirectoriesEnum]}"
-            )
+    except FileExistsError as file_exists:
+        logging.warning(f"directory '{name}' already exists, check for existing data")
+        raise FileExistsError(
+            "remove the following directories to proceed: "
+            f"{[directory.value for directory in DirectoriesEnum]}"
+        ) from file_exists
 
 
-def throw_away_lines(iterator, n):
-    """
-    A fast way to throw away data we don't need. Advance the iterator n-steps ahead.
+def throw_away_lines(iterator, n: int) -> None:
+    """A fast way to throw away data we don't need.
+
+    This function advances the iterator n-steps ahead.
     If n is None, consume entirely.
 
     Arguments:
@@ -71,13 +78,12 @@ def throw_away_lines(iterator, n):
         next(itertools.islice(iterator, n, n), None)
 
 
-def read_xyz(xyz_file, step=None):
-    """
-    Reads data from either the first or last step of an XYZ file.
+def read_xyz(xyz_file: path, step: int | None = None) -> State:
+    """Reads data from either the first or last step of an XYZ file.
 
     Arguments:
         xyz_file (path): path to XYZ file
-        step (default=None): reads the final step when None, first step when
+        step (int | None): reads the final step when None, first step when
         equal to 1
 
     Returns:
@@ -100,20 +106,24 @@ def read_xyz(xyz_file, step=None):
     with open(xyz_file) as file:
         throw_away_lines(file, num_lines_to_skip)
         atom_data = [line.split() for ii, line in enumerate(file) if ii < num_atoms]
-        coordinates = [
-            np.array([float(atom[1]), float(atom[2]), float(atom[3])])
-            for atom in atom_data
-        ]
+
+        # No need for repeated casting calls, simply set
+        # the dtype in the numpy array initialisation
+        coordinates = np.array([[atom[1], atom[2], atom[3]] for atom in atom_data], dtype=float)
+
         elements = [atom[0] for atom in atom_data]
 
     if len(atom_data) != num_atoms:
-        raise IOError(f"error reading step {step} of {xyz_file}")
+        raise OSError(f"error reading step {step} of {xyz_file}")
 
     return State(np.array(coordinates), elements, velocities=None)
 
 
-def write_file_using_template(output_filename, template_filename, template_values):
-    """
+def write_file_using_template(
+    output_filename: path, template_filename: path, template_values: dict
+) -> None:
+    """Writes the file using the stdlib template module.
+
     Uses the stdlib template module to perform find and replace in the provided
     template and write a new file.
 

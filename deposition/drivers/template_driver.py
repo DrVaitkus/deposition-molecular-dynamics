@@ -1,17 +1,24 @@
+"""Formulate the driver template for backends.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import os
 
+import numpy as np
 from schema import Or
 
 from deposition import io
-from deposition.drivers.molecular_dynamics_driver import \
-    MolecularDynamicsDriver
+from deposition.drivers.molecular_dynamics_driver import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
 
 
+# FIXME: Template is inconsistent with implementation: Liskov Substitution Principle (LSP)
 class TemplateDriver(MolecularDynamicsDriver):
-    """Template to help with writing new MolecularDynamicsDriver classes"""
+    """Template to help with writing new MolecularDynamicsDriver classes."""
 
-    schema_dict = {
+    schema_dict: dict = {
         "atomic_masses": list,
         "path_to_potential": os.path.exists,
         "thermostat_parameter": Or(float, int),
@@ -23,7 +30,8 @@ class TemplateDriver(MolecularDynamicsDriver):
 
     command = "${prefix} ${binary} ${arguments} < ${input_file} > ${output_file}"
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict) -> None:
+        """Initialise template MD driver."""
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -33,15 +41,21 @@ class TemplateDriver(MolecularDynamicsDriver):
         )
 
     def write_inputs(
-        self, filename, coordinates, elements, velocities, iteration_stage
-    ):
-        def write_coordinates(file, coordinates):
+        self,
+        filename: str,
+        coordinates: np.ndarray,
+        elements: list,
+        velocities: np.ndarray,
+        iteration_stage: str,
+    ) -> None:
+        """Write inputs to file."""
+        def write_coordinates(file, coordinates: np.ndarray) -> None:
             pass
 
-        def write_elements(file, elements):
+        def write_elements(file, elements: list) -> None:
             pass
 
-        def write_velocities(file, elements):
+        def write_velocities(file, velocities: np.ndarray) -> None:
             pass
 
         if iteration_stage == "deposition":
@@ -61,15 +75,17 @@ class TemplateDriver(MolecularDynamicsDriver):
         if iteration_stage == "deposition":
             write_velocities(f"{filename}.input", velocities)
 
+    # FIXME: Implementations use State class but template doesn't.
     @staticmethod
-    def read_outputs(filename):
-        def read_coordinates(file):
+    def read_outputs(filename: str) -> tuple[np.ndarray, list, np.ndarray]:
+        """Read the outputs."""
+        def read_coordinates(file) -> None:
             pass
 
-        def read_elements(file):
+        def read_elements(file) -> None:
             pass
 
-        def read_velocities(file):
+        def read_velocities(file) -> None:
             pass
 
         coordinates = read_coordinates(f"{filename}.output")

@@ -1,3 +1,9 @@
+"""Utilities for simulation cells, drivers and so forth.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import logging
 
 import numpy as np
@@ -10,8 +16,9 @@ from deposition.drivers.driver_enums import DriverEnum
 from deposition.enums import SettingsEnum
 
 
-def get_simulation_cell(simulation_cell):
-    """
+def get_simulation_cell(simulation_cell: dict) -> dict:
+    """Obtain additional simulation cell information from pymatgen.
+
     Additional geometry of the simulation cell is calculated using routines from the
     `pymatgen` module including bounds specification for use with LAMMPS and the cell
     vectors
@@ -19,6 +26,7 @@ def get_simulation_cell(simulation_cell):
     Arguments:
         simulation_cell (dict): simulation cell settings
             (see :meth:`format <deposition.schema_definitions.simulation_cell_schema>`)
+
     Return:
         simulation_cell (dict): updated simulation cell with additional geometry
     """
@@ -59,14 +67,14 @@ def get_simulation_cell(simulation_cell):
 
 
 def get_molecular_dynamics_driver(
-    driver_settings,
-    simulation_cell,
-    deposition_time_picoseconds,
-    relaxation_time_picoseconds,
-):
-    """
-    Initialises one of the available molecular dynamics drivers. For more information
-    about drivers see :ref:`here <drivers>`.
+    driver_settings: dict,
+    simulation_cell: dict,
+    deposition_time_picoseconds: int | float,
+    relaxation_time_picoseconds: int | float,
+) -> DriverEnum:
+    """Initialises one of the available molecular dynamics drivers.
+
+    For more information about drivers see :ref:`here <drivers>`.
 
     Arguments:
         driver_settings (dict): settings for the specified driver
@@ -81,40 +89,28 @@ def get_molecular_dynamics_driver(
 
     try:
         driver_class = DriverEnum[driver_name].value
-    except KeyError:
-        raise ValueError(f"no driver with the name '{driver_name}' was found")
-
-    # for driver in DriverEnum:
-    #     if driver_name == driver.name:
-    #         driver_class = driver.value
-    #         break
-    # else:
-    #     raise ValueError(f"no driver with the name '{chosen_driver}' was found")
+    except KeyError as bad_driver:
+        raise ValueError(f"no driver with the name '{driver_name}' was found") from bad_driver
 
     simulation_cell_full = get_simulation_cell(simulation_cell)
     driver = driver_class(driver_settings, simulation_cell_full)
 
     input_schema.check_input_file_syntax(driver)
-    driver.settings.update(
-        {SettingsEnum.DEPOSITION_TIME.value: deposition_time_picoseconds}
-    )
-    driver.settings.update(
-        {SettingsEnum.RELAXATION_TIME.value: relaxation_time_picoseconds}
-    )
+    driver.settings.update({SettingsEnum.DEPOSITION_TIME.value: deposition_time_picoseconds})
+    driver.settings.update({SettingsEnum.RELAXATION_TIME.value: relaxation_time_picoseconds})
     logging.info(f"Using driver for {driver_name}")
 
     return driver
 
 
-def generate_neighbour_list(simulation_cell, coordinates, bonding_distance_cutoff):
-    """
-    Create a neighbour list for the current state to check for isolated atoms
-    or molecules.
+def generate_neighbour_list(
+    simulation_cell: dict, coordinates: np.ndarray, bonding_distance_cutoff: float
+) -> list:
+    """Create a neighbour list to check for isolated atoms or molecules.
 
     Arguments:
-        simulation_cell (dict): specification of the size and shape of the simulation
-        cell
-        coordinates (np.array): coordinate data
+        simulation_cell (dict): size and shape of the simulation cell.
+        coordinates (np.ndarray): coordinate data
         bonding_distance_cutoff (float): distance below which to consider atoms
         bonded (Angstroms)
 
@@ -125,27 +121,31 @@ def generate_neighbour_list(simulation_cell, coordinates, bonding_distance_cutof
     fake_elements = ["X" for _ in range(len(coordinates))]
     sites = [
         PeriodicSite(element, coordinate, lattice, coords_are_cartesian=True)
-        for element, coordinate in zip(fake_elements, coordinates)
+        for element, coordinate in zip(fake_elements, coordinates, strict=True)
     ]
     structure = IStructure.from_sites(sites)
     neighbours = structure.get_all_neighbors(bonding_distance_cutoff)
-    neighbour_list = [len(atom_neighbours) for atom_neighbours in neighbours]
-    return neighbour_list
+    return [len(atom_neighbours) for atom_neighbours in neighbours]  # neighbour_list
 
 
-def wrap_coordinates_in_z(simulation_cell, coordinates, percentage_of_box=80):
-    """
-    Take cartesian state and wrap those at the top of the box back the main
-    structure at the bottom of the box. This will set negative z_plane-state for those
-    atoms which are wrapped.
+def wrap_coordinates_in_z(
+    simulation_cell: dict, coordinates: np.ndarray, percentage_of_box: float = 80.0
+) -> np.ndarray:
+    """Wraps atoms that have been moved to the top of the box back around.
+
+    Take cartesian state and wrap those at the top of the box back
+    into the main structure at the bottom of the box. This will
+    set negative z_plane-state for those atoms which are wrapped.
+
+    FIXME: Technically this is an unwrap.
 
     Arguments:
         simulation_cell (dict): size and shape of the simulation cell
-        coordinates (np.array): coordinate data
+        coordinates (np.ndarray): coordinate data
         percentage_of_box (float): how much of the cell is not wrapped
 
     Returns:
-        wrapped_coordinates (np.array): coordinate data where high z_plane-values are
+        wrapped_coordinates (np.ndarray): coordinate data where high z_plane-values are
         wrapped to negative z_plane-values
     """
     lz = simulation_cell["z_max"] - simulation_cell["z_min"]

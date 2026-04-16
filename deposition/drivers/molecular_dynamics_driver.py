@@ -1,3 +1,8 @@
+"""Define the MD driver base class.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
 import os
 
 from schema import And, Optional, Or, Schema, Use
@@ -6,9 +11,7 @@ from deposition.input_schema import reserved_keyword, strictly_positive
 
 
 class MolecularDynamicsDriver:
-    """
-    Generic molecular dynamics driver class
-    """
+    """Generic molecular dynamics driver class."""
 
     _command = "${prefix} ${binary} ${arguments} < ${input_file} > ${output_file}"
 
@@ -16,9 +19,7 @@ class MolecularDynamicsDriver:
         "name": str,
         "path_to_binary": os.path.exists,
         "path_to_input_template": os.path.exists,
-        "velocity_scaling_from_metres_per_second": And(
-            Or(int, float), Use(strictly_positive)
-        ),
+        "velocity_scaling_from_metres_per_second": And(Or(int, float), Use(strictly_positive)),
         Optional("command_line_args", default=""): str,
     }
 
@@ -28,13 +29,13 @@ class MolecularDynamicsDriver:
 
     def __init__(
         self,
-        driver_settings,
-        simulation_cell,
+        driver_settings: dict,
+        simulation_cell: dict,
         command=None,
-        schema_dict=None,
+        schema_dict: dict | None = None,
         reserved_keywords=None,
-    ):
-
+    ) -> None:
+        """Initialise generic MD Driver."""
         if command is not None:
             self.command = command
         else:
@@ -60,6 +61,6 @@ class MolecularDynamicsDriver:
         self.simulation_cell = simulation_cell
         self.binary = self.settings["path_to_binary"]
 
-    def get_reserved_keywords(self):
-        """Returns a list of global and driver specific reserved keywords"""
+    def get_reserved_keywords(self) -> list:
+        """Returns a list of global and driver specific reserved keywords."""
         return self._reserved_keywords

@@ -1,0 +1,128 @@
+[project]
+authors = [
+    { name = "Martin J. Cyster" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "click>=7.1.2",
+    "numpy>=1.20.2",
+    "pandas>=1.2.4",
+    "pymatgen>=2022.0.8",
+    "PyYAML>=5.4.1",
+    "schema>=0.7.4",
+    "Sphinx>=4.2.0",
+]
+description = "Molecular dynamics wrapper for deposition simulations"
+license = { file = "LICENSE" }
+maintainers = [
+    { name = "Martin J. Cyster" },
+    { name = "Jesse A. Vaitkus", email = "jesse.vaitkus2@rmit.edu.au" },
+    ]
+name = "deposition"
+readme = "README.rst"
+requires-python = ">=3.10"
+version = "1.0.0-beta"
+
+[project.urls]
+Homepage = "https://github.com/mmtn/deposition-molecular-dynamics"
+
+[project.optional-dependencies]
+examples = ["ipykernel"]
+tests = ["coverage", "pytest", "pytest-cov"]
+dev = ["darglint", "mypy", "ruff"]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+
+[tool.mypy]
+# check_untyped_defs = true
+ignore_missing_imports = true
+follow_imports = "silent"
+pretty = true
+warn_unused_ignores = true
+explicit_package_bases = true
+plugins = "numpy.typing.mypy_plugin"
+
+[tool.coverage.run]
+branch = true
+omit = ["tests/*", "*test*.py"]
+source = ["deposition"]
+
+[tool.coverage.paths]
+source = ["src", "**/site-packages"]
+testpaths = ["tests"]
+
+[tool.ruff]
+extend-include = ["*.ipynb"]  # To include Jupyter notebooks into checking
+fix = true
+line-length = 99            # same as black
+show-fixes = true
+
+[tool.ruff.lint]
+allowed-confusables = ["⨯", "α", "β", "γ", "σ"]
+select = [
+    "A",     # builtins
+    "ANN",   # annotations
+    "ARG",   # unused arguments
+    "ASYNC", # Adds checks for asynchronous
+    "B",     # bugbear
+    "BLE",   # Blind exceptions
+    "C",     # Encourage comprehensions
+    "C90",   # mccabe complexity
+    "D",     # pydocstyle
+    "E",     # pycodestyle
+    "ERA",   # remove commented out code
+    "F",     # pyflakes
+    "FBT",   # Encourages keyword only booleans
+    "FIX",   # Notes any todo/fixme/hack annotations
+    "FLY",   # Fixes old format to f-strings
+    "I",     # isort
+    "ISC",   # Fix implicit string concatenation
+    "N",     # pep8-naming
+    "NPY",   # numpy
+    "PERF",  # Perflint, avoid unnecessary casting
+    "PIE",   # pie Conciseness
+    "PL",    # pylint
+    "PT",    # pytest
+    "RET",   # return, keeps returns clean
+    "RUF",   # ruff
+    "S",     # bandit
+    "TCH",   # type checking
+    # "TRY",   # Tryceratops, better errors
+    "UP",    # Pyupgrade encourages latest syntax
+    "W",     # Warnings
+]
+# ignore specific violations
+ignore = ["D401"]
+fixable = ["ALL"] # Autofix for all safe enabled rules when `--fix` is provided.
+unfixable = []
+
+# exclude the following patterns from linting
+exclude = [
+    ".git",
+    "__pycache__",
+    "docs/conf.py",
+    "old",
+    "build",
+    "dist",
+    "test_*",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 20
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*.ipynb" = ["ERA001"]

@@ -1,22 +1,26 @@
+"""Implement the LAMMPS MD software driver code.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import numpy as np
 import pandas as pd
 from pymatgen.io.lammps.data import LammpsData
 from schema import And, Optional, Or, Use
 
 from deposition import input_schema, io
+from deposition.drivers.molecular_dynamics_driver import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
-from deposition.drivers.molecular_dynamics_driver import \
-    MolecularDynamicsDriver
 from deposition.state import State
 
 
 class LAMMPSDriver(MolecularDynamicsDriver):
-    """
-    Class to interface between deposition package and LAMMPS software
+    """Class to interface between deposition package and LAMMPS software.
 
-    LAMMPSDriver defines input variables required for the driver functions to work, as well as how to call LAMMPS on the
-    command line, write LAMMPS input files, and read LAMMPS output files. The `schema_dict` defines additional
-    inputs which are required when using the LAMMPS driver.
+    LAMMPSDriver defines input variables required for the driver functions to work, as well as how
+    to call LAMMPS on the command line, write LAMMPS input files, and read LAMMPS output files.
+    The `schema_dict` defines additional inputs which are required when using the LAMMPS driver.
     """
 
     schema_dict = {
@@ -29,11 +33,12 @@ class LAMMPSDriver(MolecularDynamicsDriver):
     }
     """
     The names and types of additional inputs for LAMMPS:
-    
+
     - atomic_masses (list): masses of elements in the potential in atomic mass units
     - elements_in_potential (str): space separated list of elements in the potential, e.g. "Al O H"
-    - timestep_scaling_from_picoseconds (int/float): required to calculate `num_steps` from the simulation times
-    
+    - timestep_scaling_from_picoseconds (int | float): required to calculate
+        `num_steps` from the simulation times
+
     Note: the length and order of `atomic_masses` and `elements_in_potential` must match.
     """
 
@@ -42,14 +47,15 @@ class LAMMPSDriver(MolecularDynamicsDriver):
     ]
     """
     The names of keywords used internally for running LAMMPS simulations:
-    
+
     - num_steps (int): the total number of steps in the calculation (total time / timestep)
     """
 
     command = "${prefix} ${binary} ${arguments} -in ${input_file} > ${output_file}"
     """Template used when calling LAMMPS subprocesses."""
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict) -> None:
+        """Initialise LAMMPS driver."""
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -58,13 +64,15 @@ class LAMMPSDriver(MolecularDynamicsDriver):
             reserved_keywords=self.reserved_keywords,
         )
 
-    def write_inputs(self, filename, state, iteration_stage):
-        """
-        Write LAMMPS input file and input system data to run the next part of the deposition calculation.
+    def write_inputs(self, filename: str, state: State, iteration_stage: str) -> None:
+        """Write LAMMPS input file.
+
+        Write LAMMPS input file and input system data to
+        run the next part of the deposition calculation.
 
         Arguments:
             filename (str): name to use for input files
-            state: coordinates, elements, velocities
+            state (State): coordinates, elements, velocities
             iteration_stage (str): either "relaxation" or "deposition"
         """
         input_filename = f"{filename}.input"
@@ -74,21 +82,15 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         scaling = self.settings["timestep_scaling_from_picoseconds"]
 
         if iteration_stage == "relaxation":
-            relaxation_num_steps = (
-                self.settings[SettingsEnum.RELAXATION_TIME.value] * scaling
-            )
+            relaxation_num_steps = self.settings[SettingsEnum.RELAXATION_TIME.value] * scaling
             template_values.update({"num_steps": int(relaxation_num_steps)})
         elif iteration_stage == "deposition":
-            deposition_num_steps = (
-                self.settings[SettingsEnum.DEPOSITION_TIME.value] * scaling
-            )
+            deposition_num_steps = self.settings[SettingsEnum.DEPOSITION_TIME.value] * scaling
             template_values.update({"num_steps": int(deposition_num_steps)})
 
         # Write input file using template
         template_values.update({"filename": filename})
-        template_values.update(
-            {"elements_in_potential": self.settings["elements_in_potential"]}
-        )
+        template_values.update({"elements_in_potential": self.settings["elements_in_potential"]})
 
         io.write_file_using_template(
             input_filename, self.settings["path_to_input_template"], template_values
@@ -98,9 +100,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         list_of_elements_in_potential = self.settings["elements_in_potential"].split()
         for element_index, element in enumerate(state.elements):
             if element in list_of_elements_in_potential:
-                state.elements[element_index] = (
-                    list_of_elements_in_potential.index(element) + 1
-                )
+                state.elements[element_index] = list_of_elements_in_potential.index(element) + 1
         element_integers = [int(element) for element in state.elements]
 
         # Set up indices for pandas dataframes
@@ -114,9 +114,7 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         charges_dataframe = pd.DataFrame(
             np.zeros(((len(state.elements)), 1)), index=atom_indices, columns=["q"]
         )
-        elements_dataframe = pd.DataFrame(
-            element_integers, index=atom_indices, columns=["type"]
-        )
+        elements_dataframe = pd.DataFrame(element_integers, index=atom_indices, columns=["type"])
         coordinates_dataframe = pd.DataFrame(
             state.coordinates, index=atom_indices, columns=["x", "y", "z"]
         )
@@ -140,9 +138,8 @@ class LAMMPSDriver(MolecularDynamicsDriver):
         lammps_data_object.write_file(input_data_filename)
 
     @staticmethod
-    def read_outputs(filename):
-        """
-        Read simulation data from LAMMPS output files and return coordinate, element, and velocity data.
+    def read_outputs(filename: str) -> State:
+        """Read data from LAMMPS output files and return coordinate, element, and velocity data.
 
         Arguments:
             filename (str): basename to use for reading output files

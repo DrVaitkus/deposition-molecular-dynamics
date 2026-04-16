@@ -1,16 +1,22 @@
+"""Runs the deposition from command line.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import sys
 
 import click
 
 import deposition
 from deposition.settings import Settings
+from deposition.types import path
 
 
 @click.command()
 @click.option("--settings", "settings_filename", required=True, type=click.Path(exists=True))
-def main(settings_filename):
-    """
-    Run the deposition calculation from the command line.
+def main(settings_filename: path) -> None:
+    """Run the deposition calculation from the command line.
 
     Usage: python3 run_deposition.py --settings SETTINGS_FILENAME
 

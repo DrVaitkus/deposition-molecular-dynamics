@@ -1,3 +1,9 @@
+"""Implement the GULP MD software driver code.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import os
 
 import numpy as np
@@ -5,15 +11,16 @@ import numpy as np
 from deposition import io, physics
 from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import SettingsEnum
+from deposition.path import path
 from deposition.state import State
 
 
 class GULPDriver(MolecularDynamicsDriver):
-    """
-    Class to interface between deposition package and GULP software.
+    """Class to interface between deposition package and GULP software.
 
-    GULPDriver defines input variables required for the driver functions to work, as well as how to call GULP on the
-    _command line, write GULP input files, and read GULP output files. The `schema_dict` defines additional
+    GULPDriver defines input variables required for the driver functions to
+    work, as well as how to call GULP on the _command line, write GULP input
+    files, and read GULP output files. The `schema_dict` defines additional
     inputs which are required when using the GULP driver.
     """
 
@@ -23,7 +30,7 @@ class GULPDriver(MolecularDynamicsDriver):
     """
     The names and types of additional inputs for GULP:
 
-    - GULP_LIB (path): location of GULP library folder containing provided potentials 
+    - GULP_LIB (path): location of GULP library folder containing provided potentials
     """
 
     reserved_keywords = [
@@ -48,7 +55,8 @@ class GULPDriver(MolecularDynamicsDriver):
     - gamma (float): used in template to specify simulation cell
     """
 
-    def __init__(self, driver_settings, simulation_cell):
+    def __init__(self, driver_settings: dict, simulation_cell: dict) -> None:
+        """Initialise the GULP driver."""
         super().__init__(
             driver_settings,
             simulation_cell,
@@ -57,16 +65,16 @@ class GULPDriver(MolecularDynamicsDriver):
         )
         self.set_environment_variables()
 
-    def set_environment_variables(self):
-        """
-        Uses the user provided value for GULP_LIB to set the environment variable. This is essential to use the
-        potentials which ship with GULP.
+    def set_environment_variables(self) -> None:
+        """Set the environment variable for the GULP library.
+
+        Uses the user provided value for GULP_LIB to set the environment
+        variable. This is essential to use the potentials which ship with GULP.
         """
         os.putenv("GULP_LIB", self.settings["GULP_LIB"])
 
-    def write_inputs(self, filename, state, iteration_stage):
-        """
-        Write GULP input file for the next part of the deposition calculation.
+    def write_inputs(self, filename: str, state: State, iteration_stage: str) -> None:
+        """Write GULP input file for the next part of the deposition calculation.
 
         Arguments:
             filename (str): name to use for input files
@@ -74,36 +82,35 @@ class GULPDriver(MolecularDynamicsDriver):
             iteration_stage (str): either "relaxation" or "deposition"
         """
 
-        def write_positions(filename, coordinates, elements):
-            """
-            Write positional data to the GULP input file.
+        def write_positions(filename: str, coordinates: np.ndarray, elements: list) -> None:
+            """Write positional data to the GULP input file.
 
             Arguments:
                 filename (str): name to use for input files
-                coordinates (np.array): coordinate data
+                coordinates (np.ndarray): coordinate data
                 elements (list): atomic species data
             """
             with open(filename, "a") as file:
                 file.write("cartesian\n")
-                for atom, xyz in zip(elements, coordinates):
+                for atom, xyz in zip(elements, coordinates, strict=True):
                     file.write(f"{atom} {xyz[0]} {xyz[1]}, {xyz[2]}\n")
 
-        def write_velocities(filename, velocities):
-            """
-            Write positional data to the GULP input file.
+        def write_velocities(filename: str, velocities: np.ndarray) -> None:
+            """Write positional data to the GULP input file.
 
             Arguments:
                 filename (str): name to use for input files
-                velocities (np.array): velocity data
+                velocities (np.ndarray): velocity data
             """
             with open(filename, "a") as file:
                 file.write("velocities\n")
                 for ii, v in enumerate(velocities):
                     file.write(f"{ii} {v[0]} {v[1]} {v[2]}\n")
 
-        def parameters_from_simulation_cell(simulation_cell):
-            """
-            Get a GULP friendly specification of the simulation cell from the dict.
+        def parameters_from_simulation_cell(
+            simulation_cell: dict,
+        ) -> tuple[float, float, float, float, float, float]:
+            """Get a GULP friendly specification of the simulation cell from the dict.
 
             Arguments:
                 simulation_cell (dict): specification of the size and shape of the simulation cell
@@ -138,19 +145,11 @@ class GULPDriver(MolecularDynamicsDriver):
 
         if iteration_stage == "relaxation":
             template_values.update(
-                {
-                    "production_time_picoseconds": self.settings[
-                        SettingsEnum.RELAXATION_TIME.value
-                    ]
-                }
+                {"production_time_picoseconds": self.settings[SettingsEnum.RELAXATION_TIME.value]}
             )
         elif iteration_stage == "deposition":
             template_values.update(
-                {
-                    "production_time_picoseconds": self.settings[
-                        SettingsEnum.DEPOSITION_TIME.value
-                    ]
-                }
+                {"production_time_picoseconds": self.settings[SettingsEnum.DEPOSITION_TIME.value]}
             )
 
         template_values.update({"filename": filename})
@@ -170,20 +169,23 @@ class GULPDriver(MolecularDynamicsDriver):
             write_velocities(input_filename, state.velocities)
 
     @staticmethod
-    def get_thermostat_damping(num_atoms, temperature=300.0):
-        """
-        Calculate the required Nose-Hoover coupling constant which should give rise to canonical
-        temperature fluctuations throughout the simulation. The values used are derived from a fitted power
-        law equation. See Section 2.4.1 in my `thesis`_.
+    def get_thermostat_damping(num_atoms: int, temperature: float = 300.0) -> float:
+        """Calculate NH coupling to give rise to canonical temperature fluctuations.
+
+        This method calculates the required Nose-Hoover coupling constant which should
+        give rise to canonical temperature fluctuations throughout the simulation.
+        The values used are derived from a fitted power law equation.
+        See Section 2.4.1 of Martin J. Cyster's `thesis`_.
 
         Arguments:
             num_atoms (int): the number of atoms in the simulation
             temperature (float): temperature of the simulation in Kelvin
 
         Returns:
-            nose_hoover (float): the coupling constant required to give the canonical variance in the simulation
+            nose_hoover (float): the coupling constant required
+                to give the canonical variance in the simulation.
 
-        .. _thesis: https://researchrepository.rmit.edu.au/discovery/delivery/61RMIT_INST:RMITU/12247670720001341
+        .. _thesis: https://doi.org/10.25439/rmt.27580476
         """
         minimum_nose_hoover_parameter = 0.0001
         a = 610.0
@@ -193,49 +195,50 @@ class GULPDriver(MolecularDynamicsDriver):
         return max(round(nose_hoover, 6), minimum_nose_hoover_parameter)
 
     @staticmethod
-    def read_outputs(filename):
-        """
-        Read simulation data from GULP output files and return coordinate, element, and velocity data.
+    def read_outputs(filename: str) -> State:
+        """Read data from GULP output files and return coordinate, element, and velocity data.
 
         Arguments:
             filename (str): basename to use for reading output files
 
         Returns:
-            state: coordinates, elements, velocities
+            State: coordinates, elements, velocities
         """
 
-        def get_data_types(trajectory_file):
-            """
-            Assess the type of data contained in the trajectory file.
+        def get_data_types(trajectory_file: path) -> list:
+            """Assess the type of data contained in the trajectory file.
 
             Arguments:
-                trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
+                trajectory_file (path): GULP trajectory (.trj) file
+                    containing position, velocity, and other data.
 
             Returns:
-                list_of_data_types (list): types of data in the file, e.g. Coordinates, Velocities, Charges, etc.
+                list_of_data_types (list): types of data in the file,
+                    e.g. Coordinates, Velocities, Charges, etc.
             """
-            list_of_data_types = list()
+            list_of_data_types = []
             with open(trajectory_file) as file:
                 for line in file:
                     if line.startswith("#") and "Time" not in line:
                         data_type = line.strip("#").strip()
                         if data_type in list_of_data_types:
                             break
-                        else:
-                            list_of_data_types.append(data_type)
+                        list_of_data_types.append(data_type)
             return list_of_data_types
 
-        def get_data_from_trajectory_file(trajectory_file, data_type, step_number=None):
-            """
-            Read data from the trajectory file.
+        def get_data_from_trajectory_file(
+            trajectory_file: path, data_type: str, step_number: int | None = None
+        ) -> np.ndarray:
+            """Read data from the trajectory file.
 
             Arguments:
-                trajectory_file (path): GULP trajectory (.trj) file containing position, velocity, and other data
+                trajectory_file (path): GULP trajectory (.trj) file
+                    containing position, velocity, and other data.
                 data_type (str): type of data to read, e.g. Coordinates, Velocities, Charges, etc.
                 step_number (int or None): which step of the file to read from
 
             Returns:
-                data (np.array): data read from the file of the given type at the given step
+                data (np.ndarray): data read from the file of the given type at the given step
             """
             available_types = get_data_types(trajectory_file)
             if data_type not in available_types:
@@ -247,16 +250,12 @@ class GULPDriver(MolecularDynamicsDriver):
                 num_atoms = int(num_atoms_str)
 
             num_header_lines = 2
-            num_lines_per_step = num_header_lines + (
-                len(available_types) * (num_atoms + 1)
-            )
+            num_lines_per_step = num_header_lines + (len(available_types) * (num_atoms + 1))
             num_lines_in_file = sum(1 for _ in open(trajectory_file))
             num_steps = (num_lines_in_file - num_header_lines) / num_lines_per_step
             if step_number is None:
                 step_number = num_steps
-            num_lines_to_skip = int(
-                num_header_lines + (num_lines_per_step * (step_number - 1))
-            )
+            num_lines_to_skip = int(num_header_lines + (num_lines_per_step * (step_number - 1)))
 
             with open(trajectory_file) as file:
                 io.throw_away_lines(file, num_lines_to_skip)
@@ -270,10 +269,7 @@ class GULPDriver(MolecularDynamicsDriver):
                     for jj, value in enumerate(atom_data):
                         data[ii, jj] = value
 
-            data = data[
-                :, ~np.isnan(data).all(axis=0)
-            ]  # delete redundant columns of NaN values
-            return data
+            return data[:, ~np.isnan(data).all(axis=0)]  # delete redundant columns of NaN values
 
         coordinates, elements, _ = io.read_xyz(f"{filename}.xyz")
         velocities = get_data_from_trajectory_file(f"{filename}.trg", "Velocities")

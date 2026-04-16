@@ -1,3 +1,9 @@
+"""Sets up Iteration class for tracking the iterations in simulations.
+
+Copyright © 2021-2026 Martin J. Cyster. All Rights Reserved.
+License details given in distributed LICENSE file.
+"""
+
 import logging
 import os
 import shutil
@@ -5,27 +11,33 @@ import subprocess
 from string import Template
 
 from deposition import postprocessing, randomisation
+from deposition.drivers import MolecularDynamicsDriver
 from deposition.enums import DirectoriesEnum
+from deposition.settings import Settings
 from deposition.state import State
+from deposition.status import Status
 
 
 class Iteration:
-    """
+    """class for tracking an individual iteration in simulation.
+
     The `Iteration` class represents one cycle of relaxing the system before
-    depositing an atom/molecule as specified
-    by the input settings.
+    depositing an atom/molecule as specified by the input settings.
 
     Each iteration consists of the following steps:
 
-    - relaxation: simulation at the specified temperature to equilibrate the system
-    - deposition: simulation of the introduction of a new atom/molecule
-    - finalisation: the final simulation state is analysed against various criteria and the data is stored
+    - relaxation: simulation at the specified temperature to equilibrate the system.
+    - deposition: simulation of the introduction of a new atom/molecule.
+    - finalisation: the final state is analysed against various criteria and the data is stored.
 
     This class is also responsible for using the `subprocess` package to run the
     molecular dynamics software.
     """
 
-    def __init__(self, driver, settings, status):
+    def __init__(
+        self, driver: MolecularDynamicsDriver, settings: Settings, status: Status
+    ) -> None:
+        """Initialise the Iteration from the driver, its settings and status."""
         self.driver = driver
         self.settings = settings
         self.iteration_number = status.iteration_number
@@ -41,17 +53,16 @@ class Iteration:
         self.success = False
         self.state = State.read_state(self.pickle_location)
 
-    def run(self):
-        """
-        Runs one iteration of relaxation, deposition, and finalisation. Returns to
-        Deposition the success or failure of this iteration, and the location of
-        the saved data from which to start the next iteration.
+    def run(self) -> None:
+        """Runs one iteration of relaxation, deposition, and finalisation.
+
+        This method will return to Deposition class the success or failure of this iteration,
+        and the location of the saved data from which to start the next iteration.
 
         Returns:
              success, pickle_location (tuple)
                 - success (bool): whether the iteration passes the structural analyses
                 - pickle_location (path): where the resulting data has been saved
-
         """
         logging.info(f"starting iteration {self.iteration_number}")
         self.relaxation()
@@ -60,15 +71,14 @@ class Iteration:
         self.finalisation()
         return self.success, self.pickle_location
 
-    def relaxation(self):
+    def relaxation(self) -> None:
         """Runs the relaxation phase of the iteration."""
         self.driver.write_inputs(self.relaxation_filename, self.state, "relaxation")
         self.call_process(self.relaxation_filename)
         self.state = self.driver.read_outputs(self.relaxation_filename)
 
-    def deposition(self):
-        """Runs the deposition phase of the iteration including the random addition
-        of new atoms/molecules."""
+    def deposition(self) -> None:
+        """Run deposition phase including the random addition of new atoms/molecules."""
         self.state = randomisation.new_coordinates_and_velocities(
             self.settings,
             self.state,
@@ -79,8 +89,8 @@ class Iteration:
         self.call_process(self.deposition_filename)
         self.state = self.driver.read_outputs(self.deposition_filename)
 
-    def finalisation(self):
-        """Finalises the iteration by moving the data to the appropriate directory"""
+    def finalisation(self) -> None:
+        """Finalises the iteration by moving the data to the appropriate directory."""
         self.state.write(f"{self.deposition_filename}.pickle", include_velocities=False)
         if self.success:
             destination_directory = os.path.join(
@@ -100,7 +110,7 @@ class Iteration:
         shutil.rmtree(DirectoriesEnum.WORKING.value)
         os.mkdir(DirectoriesEnum.WORKING.value)
 
-    def run_postprocessing(self):
+    def run_postprocessing(self) -> None:
         """Runs postprocessing routines on the final state of the deposition phase."""
         if self.settings.postprocessing is None:
             self.success = True
@@ -120,13 +130,13 @@ class Iteration:
             logging.warning("post-processing check failed")
             logging.warning(warning)
             if self.settings.strict_postprocessing:
-                raise RuntimeError(warning)
+                raise RuntimeError(warning) from warning
             self.success = False
 
-    def call_process(self, filename):
+    def call_process(self, filename: str) -> None:
         """Run the molecular dynamics software for this phase of the iteration."""
         command_template = Template(self.driver.command)
-        command_template_values = dict()
+        command_template_values: dict = {}
         command_template_values["prefix"] = self.settings.command_prefix
         command_template_values["binary"] = self.driver.binary
         command_template_values["arguments"] = self.driver.settings["command_line_args"]
@@ -134,4 +144,4 @@ class Iteration:
         command_template_values["output_file"] = f"{filename}.output"
         command = command_template.substitute(command_template_values)
         logging.info(f"running: {command}")
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, shell=True, check=True)  # FIXME: sheell=True is security issue
