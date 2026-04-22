@@ -15,7 +15,7 @@ velocity_distribution: gaussian
 velocity_distribution_parameters: [300, 1e-25, 0]  # temperature, atom weight, centre
 postprocessing:
     num_neighbours: [1, 9]  # min num neighbours, bonding distance
-    shift_to_origin: True
+    shift_to_origin: False  # Currently does nothing.
 
 # 2. Driver settings
 driver_settings:
